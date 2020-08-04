@@ -134,17 +134,15 @@ class App extends React.Component {
     }
 
 //todo this function is analogue addCityFunction.
-    getNewDataForCity(city) {
+    getNewDataForCity(citiesAndSource) {
         const url = "weather/current";
-        let citiesData = this.createUpdatedCitiesList(city);
-        citiesData["cities"] = [city];
-        const sendPostIPARequest = async (citiesData) => {
+        const sendPostIPARequest = async (citiesAndSource) => {
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(citiesData)
+                body: JSON.stringify(citiesAndSource)
             });
             if (!response.ok) {
                 this.changeSpinnerStatus(false);
@@ -156,7 +154,7 @@ class App extends React.Component {
                 return await response.json();
             }
         };
-        return sendPostIPARequest(citiesData);
+        return sendPostIPARequest(citiesAndSource);
     }
 
 //todo the logic in this function should be split
@@ -207,50 +205,29 @@ class App extends React.Component {
         };
         return sendPostIPARequest(JSON.stringify(citiesData));
     }
-
-    // async onClickRefreshData(city, callback) {
-    //     if (!(await this.getNewDataForCity(city))) {
-    //         return
-    //     }
-    //     let updateDataForAllCities = [];
-    //     let cloneDataForAllCity = JSON.parse(JSON.stringify(this.state.cities));
-    //     for (let i = 0; i < cloneDataForAllCity.length; i++) {
-    //         city = cloneDataForAllCity[i]["city"];
-    //         let newWeather = await this.onClickAddCity(city);
-    //         if (cloneDataForAllCity[i]["threeDayWeatherStatus"]) {
-    //             newWeather[0]["threeDayWeatherStatus"] = true;
-    //             newWeather[0]["threeDayData"] = (await this.getWeatherOnThreeDays(city));
-    //         }
-    //         updateDataForAllCities.push(newWeather[0]);
-    //     }
-    //     if (callback) callback();
-    //     this.setState({cities: updateDataForAllCities});
-    // }
     async onClickRefreshData(callback) {
-// todo no need other request.
-        if (!(await this.getNewDataForCity(''))) {
-            return
-        }
         let citiesAndSource = this.createDataListForRefreshInformation();
-        if (!citiesAndSource) {
+        let newWeather = await (await this.getNewDataForCity(citiesAndSource));
+        if (!citiesAndSource || !newWeather) {
             return
         }
-        let newWeather = await this.onClickAddCity(citiesAndSource);
         let updateDataForAllCities = [];
         let cloneDataForAllCity = JSON.parse(JSON.stringify(this.state.cities));
         for (let i = 0; i < newWeather.length; i++) {
             let newWeatherData = newWeather[i];
             for (let j = 0; j < cloneDataForAllCity.length; j++) {
                 let cloneData = cloneDataForAllCity[i];
-                if (cloneData["city"] === newWeatherData["city"] && cloneData["threeDayWeatherStatus"])
+                if (cloneData["city"] === newWeatherData["city"] && cloneData["threeDayWeatherStatus"]) {
                     newWeatherData["threeDayWeatherStatus"] = true;
 //todo it is to many requests. It must be just one with all cities.
-                newWeatherData["threeDayData"] = (await this.getWeatherOnThreeDays(cloneData["city"]));
+                    newWeatherData["threeDayData"] = (await this.getWeatherOnThreeDays(cloneData["city"]));
+                }
             }
             updateDataForAllCities.push(newWeatherData);
         }
-        if (callback) callback();
+        localStorage.setItem('CitiesData', JSON.stringify(updateDataForAllCities));
         this.setState({cities: updateDataForAllCities});
+        if (callback) callback();
     }
 
     setThreeDayWeatherData(dateWeatherForThreeDay, city) {
