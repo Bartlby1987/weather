@@ -2,7 +2,8 @@ const fs = require("fs");
 let forecastWeatherProvider = require('../model/forecast-weather-provider/forecast-weather-provider');
 let path = require("path");
 let cacheFilePath = path.resolve("./cache/forecast-cache.json");
- function getForecast(requestData) {
+
+function getForecast(requestData) {
     let cacheFileString = fs.readFileSync(cacheFilePath, "utf8");
     // console.log("\n Данные полученные из кэша :\n\n" + cacheFileString+"\n\n");
     let weatherData = [];
@@ -11,7 +12,7 @@ let cacheFilePath = path.resolve("./cache/forecast-cache.json");
         forecastData["city"] = requestData["city"];
         forecastData["sources"] = requestData["citiesSource"];
         forecastData["requestTime"] = new Date().getTime();
-        let forecastWeather=forecastWeatherProvider.getForecastWeatherData(requestData);
+        let forecastWeather = forecastWeatherProvider.getForecastWeatherData(requestData);
         forecastData["forecastWeather"] = forecastWeather;
         weatherData.push(forecastData);
         // console.log("Запивываем данные в случае отсутствия данных в кэше  :\n\n" + JSON.stringify(weatherData)+"\n\n");
@@ -37,7 +38,7 @@ let cacheFilePath = path.resolve("./cache/forecast-cache.json");
             return oldOneCityForecast;
         }
         if (isNewAndOldCitiesAreEqual) {
-            let threeDaysWeatherData =  forecastWeatherProvider.getForecastWeatherData(requestData);
+            let threeDaysWeatherData = forecastWeatherProvider.getForecastWeatherData(requestData);
             // console.log("\n\nДанные полученные за 3 дня :\n\n"+JSON.stringify(threeDaysWeatherData));
             weatherWriteTimeRequest = new Date().getTime();
             oldOneCityForecast = threeDaysWeatherData;
@@ -48,7 +49,7 @@ let cacheFilePath = path.resolve("./cache/forecast-cache.json");
         }
     }
 
-    let forecast =  forecastWeatherProvider.getForecastWeatherData(requestData);
+    let forecast = forecastWeatherProvider.getForecastWeatherData(requestData);
     let newCityForecast = {
         "city": requestData["city"],
         "sources": requestData["citiesSource"],
@@ -61,7 +62,7 @@ let cacheFilePath = path.resolve("./cache/forecast-cache.json");
     return forecast
 }
 
-  // console.log(getForecast({citiesSource: {yandexFlag: true, gismeteoFlag: true, weatherFlag: true}, city: "Рим"}));
+// console.log(getForecast({citiesSource: {yandexFlag: true, gismeteoFlag: true, weatherFlag: true}, city: "Рим"}));
 module.exports = {
     getForecast: getForecast
 };

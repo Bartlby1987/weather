@@ -76,6 +76,7 @@ function getYandexDataWeatherForThreeDay(city) {
     detailWeatherPage = encodeURI(detailWeatherPage);
     let rest = request('GET', detailWeatherPage, {});
     let $ = cheerio.load(rest.body);
+
     function getTempDay(dayValue) {
         let tempDay = $("body > div > div:nth-child(" + dayValue + ") > dd > table > tbody > tr:nth-child(2) > td.weather-table__body-cell.weather-table__body-cell_type_feels-like > div").text();
         if (tempDay === "") {

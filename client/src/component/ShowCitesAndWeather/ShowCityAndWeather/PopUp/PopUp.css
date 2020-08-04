@@ -7,11 +7,12 @@
     right: 0;
     bottom: 0;
     margin: auto;
-    background-color:darkgray;
+    background-color: darkgray;
     text-align: center;
-    font-size:1.4vh;
+    font-size: 1.4vh;
 
 }
+
 .popup\_inner {
     position: absolute;
     left: 25%;
@@ -23,12 +24,13 @@
     text-align: center
 
 }
-.center{
-    width:40em;
-    height:30em;
-    position:absolute;
-    left:40%;
-    top:45%;
-    margin:-10em 0 0 -15em;
+
+.center {
+    width: 40em;
+    height: 30em;
+    position: absolute;
+    left: 40%;
+    top: 45%;
+    margin: -10em 0 0 -15em;
 
 }

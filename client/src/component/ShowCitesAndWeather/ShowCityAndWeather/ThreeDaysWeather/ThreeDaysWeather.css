@@ -1,10 +1,11 @@
-.table_size{
+.table_size {
     text-align: center;
-    background:aliceblue ;
+    background: aliceblue;
     width: 100%;
-    table-layout:fixed;
+    table-layout: fixed;
 }
-h5{
+
+h5 {
     text-align: center;
     text-decoration: underline
 }

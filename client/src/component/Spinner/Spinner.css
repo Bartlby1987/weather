@@ -17,7 +17,7 @@
     height: 34.72px;
     border-radius: 5.425px / 17.36px;
     transform-origin: 5.425px 67.27px;
-    zoom:0.1
+    zoom: 0.1
 }
 
 .ldio-tivnk6w9byl div:nth-child(1) {
@@ -53,7 +53,7 @@
 .ldio-tivnk6w9byl div:nth-child(6) {
     transform: rotate(150deg);
     animation-delay: -0.8196721311475409s;
-    background:black;
+    background: black;
 }
 
 .ldio-tivnk6w9byl div:nth-child(7) {
@@ -93,7 +93,7 @@
 }
 
 .loadingio-spinner-spinner-sklyelhv7p {
-    width:71px;
+    width: 71px;
     height: 17px;
     display: inline-block;
     overflow: hidden;

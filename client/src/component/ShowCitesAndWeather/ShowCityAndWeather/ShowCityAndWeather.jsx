@@ -79,7 +79,7 @@ class ShowCityAndWeather extends React.Component {
                 weatherComHumidity = "Нет данных";
             }
         }
-        let showThreeDaysWeather = this.props.weather&&this.props.weather.threeDayWeatherStatus && this.props.weather.threeDayData;
+        let showThreeDaysWeather = this.props.weather && this.props.weather.threeDayWeatherStatus && this.props.weather.threeDayData;
         let cityData =
             <div className="div_border_city ">
                 <div className="square">

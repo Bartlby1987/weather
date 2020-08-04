@@ -88,13 +88,13 @@ class ThreeDaysWeather extends React.Component {
                     <tr>
                         <th>Д/Н</th>
                         <th>
-                            <div>{firstWeekDay+","+firstMounthData}</div>
+                            <div>{firstWeekDay + "," + firstMounthData}</div>
                         </th>
                         <th>
-                            <div>{secondWeekDay+","+secondMounthData}</div>
+                            <div>{secondWeekDay + "," + secondMounthData}</div>
                         </th>
                         <th>
-                            <div>{thirdWeekDay+","+thirdMounthData}</div>
+                            <div>{thirdWeekDay + "," + thirdMounthData}</div>
                         </th>
                     </tr>
                     <tr>

@@ -10,14 +10,16 @@
     border: 0.1em solid #000;
     border-radius: 1em;
     font-size: 1em;
-    margin-bottom:1em
+    margin-bottom: 1em
 }
 
 @media screen and (max-width: 599px) {
     .div_border_city {
         width: 100%;
     }
-}@media screen and (max-width: 72px) {
+}
+
+@media screen and (max-width: 72px) {
     .div_border_city {
         width: 100%;
     }

@@ -44,7 +44,7 @@ class AddCity extends React.Component {
     };
 
     render() {
-        let disableButton=(this.state.text === "")||(this.state.spinnerOn);
+        let disableButton = (this.state.text === "") || (this.state.spinnerOn);
         return (
             <div>
                 <form className="form-inline ">

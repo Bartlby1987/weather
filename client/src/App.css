@@ -1,4 +1,4 @@
-.zoom{
+.zoom {
     zoom: 1;
 }
 
@@ -7,11 +7,14 @@
         zoom: 0.9;
     }
 }
+
 @media screen and (max-width: 599px) {
     .zoom {
         zoom: 0.7;
     }
-}@media screen and (max-width: 72px) {
+}
+
+@media screen and (max-width: 72px) {
     .zoom {
         zoom: 0.5;
     }
