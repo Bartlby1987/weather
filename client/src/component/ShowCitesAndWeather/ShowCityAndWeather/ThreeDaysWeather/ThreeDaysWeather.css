@@ -1,0 +1,11 @@
+.table_size{
+    text-align: center;
+    background:aliceblue ;
+    width: 100%;
+    table-layout:fixed;
+}
+h5{
+    text-align: center;
+    text-decoration: underline
+}
+

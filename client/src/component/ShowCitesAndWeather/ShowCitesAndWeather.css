@@ -1,0 +1,38 @@
+.div_border {
+    padding: 0.5em;
+}
+
+.div_border_city {
+    position: relative;
+    padding: 1%;
+    width: 25em;
+    height: auto;
+    border: 0.1em solid #000;
+    border-radius: 1em;
+    font-size: 1em;
+    margin-bottom:1em
+}
+
+@media screen and (max-width: 599px) {
+    .div_border_city {
+        width: 100%;
+    }
+}@media screen and (max-width: 72px) {
+    .div_border_city {
+        width: 100%;
+    }
+}
+
+.section {
+    overflow: hidden;
+    transition: max-height 1.3s linear, opacity 1.3s ease-out;
+    max-height: 300px;
+    opacity: 1;
+}
+
+.section.collapsed {
+    max-height: 0;
+    opacity: 0;
+}
+
+

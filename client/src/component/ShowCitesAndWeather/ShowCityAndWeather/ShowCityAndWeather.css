@@ -1,0 +1,45 @@
+.square {
+    position: absolute;
+    left: 21em;
+}
+.square_2 {
+    position: absolute;
+    left: 0.2em;
+    zoom: 1.4;
+}
+
+
+@media screen and (max-width: 599px) {
+    .square {
+        position: absolute;
+        left: 90%;
+    }}
+
+    @media screen and (max-width: 200px) {
+    .square {
+        position: absolute;
+        left: 85%;
+    }
+}
+    @media screen and (max-width: 72px) {
+    .square {
+        position: absolute;
+        left: 87%;
+    }
+}
+
+.margin{
+    margin-top:2em
+}
+.margin_2{
+    margin-top:1em
+}
+.margin_3{
+    margin-right:4em
+}
+.table_size_current{
+    table-layout:fixed;
+    text-align: center;
+    width:100%;
+    background:aliceblue ;
+}
