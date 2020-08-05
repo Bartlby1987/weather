@@ -208,24 +208,6 @@ class App extends React.Component {
         return sendPostIPARequest(JSON.stringify(citiesData));
     }
 
-    // async onClickRefreshData(city, callback) {
-    //     if (!(await this.getNewDataForCity(city))) {
-    //         return
-    //     }
-    //     let updateDataForAllCities = [];
-    //     let cloneDataForAllCity = JSON.parse(JSON.stringify(this.state.cities));
-    //     for (let i = 0; i < cloneDataForAllCity.length; i++) {
-    //         city = cloneDataForAllCity[i]["city"];
-    //         let newWeather = await this.onClickAddCity(city);
-    //         if (cloneDataForAllCity[i]["threeDayWeatherStatus"]) {
-    //             newWeather[0]["threeDayWeatherStatus"] = true;
-    //             newWeather[0]["threeDayData"] = (await this.getWeatherOnThreeDays(city));
-    //         }
-    //         updateDataForAllCities.push(newWeather[0]);
-    //     }
-    //     if (callback) callback();
-    //     this.setState({cities: updateDataForAllCities});
-    // }
     async onClickRefreshData(callback) {
 // todo no need other request.
         if (!(await this.getNewDataForCity(''))) {

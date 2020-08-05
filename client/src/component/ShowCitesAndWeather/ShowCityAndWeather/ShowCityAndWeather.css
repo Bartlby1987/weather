@@ -1,6 +1,6 @@
 .square {
     position: absolute;
-    left: 21em;
+    left: 22em;
 }
 
 .square_2 {
@@ -36,11 +36,13 @@
 }
 
 .margin_2 {
-    margin-top: 1em
+    margin-top: 2em
 }
 
 .margin_3 {
-    margin-right: 4em
+    margin-right: 4em;
+    margin-bottom:0.6em;
+
 }
 
 .table_size_current {
