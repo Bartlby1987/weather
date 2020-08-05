@@ -3,7 +3,7 @@ const request = require('sync-request');
 const cityAndPageObject = require('../current-weather-utilities');
 
 function getCurrentYandexData(cityName) {
-    let yandexPage = `https://yandex.ru/pogoda/search?request=`;
+    const yandexPage = `https://yandex.ru/pogoda/search?request=`;
     let citiesObject = cityAndPageObject.transformStringInObject(cityName, yandexPage);
     let cityData = {};
     for (let city in citiesObject) {

@@ -3,7 +3,7 @@ const request = require('sync-request');
 const cityAndPageObject = require('../current-weather-utilities');
 
 function getCurrentGismeteoData(cityName) {
-    let gismeteoPage = `https://www.gismeteo.ru/search/`;
+    const gismeteoPage = `https://www.gismeteo.ru/search/`;
     let citiesObject = cityAndPageObject.transformStringInObject(cityName, gismeteoPage);
     let cityData = {temp: "Данных нет", humidity: "Данных нет"};
     for (let city in citiesObject) {
@@ -25,7 +25,6 @@ function getCurrentGismeteoData(cityName) {
     }
     return cityData
 }
-
 module.exports = {
     getWeather: getCurrentGismeteoData
 };
