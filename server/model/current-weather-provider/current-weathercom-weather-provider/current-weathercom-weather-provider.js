@@ -13,7 +13,9 @@ function getCurrentWeathercomData(city) {
     }
     let realTime = new Date().getTime();
     if (!cacheData[city] || (cacheData[city]["lastUpdated"] - realTime) > 3600000) {
-        let url = encodeURI(`https://api.openweathermap.org/data/2.5/weather?q=${city},&APPID=0b58b5094eddd4fdfa4a1fe10ca5034e`);
+        const weatherAPIRequest = `https://api.openweathermap.org/data/2.5/weather?q=`;
+        const weatherComKey = `,&APPID=0b58b5094eddd4fdfa4a1fe10ca5034e`;
+        let url = encodeURI(`${weatherAPIRequest}${city}${weatherComKey}`);
         let res = request('GET', url);
         if (res.statusCode!==200){
            return  {temp: "Данных нет", humidity: "Данных нет"};
