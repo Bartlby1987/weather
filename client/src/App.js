@@ -7,14 +7,14 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import {Route} from 'react-router-dom';
 import Popup from "./component/ShowCitesAndWeather/ShowCityAndWeather/PopUp/PopUp";
 
-const keyForLocalStorage = 'CitiesData';
-const keyForLocalStorageFoSource = 'Source';
+const LOCAL_STORAGE_DATA_KEY = 'CitiesData';
+const LOCAL_STORAGE_SOURCE_KEY = 'Source';
 
 class App extends React.Component {
     constructor(props) {
         super(props);
-        let data = localStorage.getItem(keyForLocalStorage);
-        let source = localStorage.getItem(keyForLocalStorageFoSource);
+        let data = localStorage.getItem(LOCAL_STORAGE_DATA_KEY);
+        let source = localStorage.getItem(LOCAL_STORAGE_SOURCE_KEY);
         if (!JSON.parse(source)) {
             source = {
                 yandexFlag: true,
@@ -134,7 +134,7 @@ class App extends React.Component {
             }
         }
         this.setState({cities: newCitiesData});
-        localStorage.setItem(keyForLocalStorage, JSON.stringify(newCitiesData))
+        localStorage.setItem(LOCAL_STORAGE_DATA_KEY, JSON.stringify(newCitiesData))
     }
 
 //todo this function is analogue addCityFunction.
@@ -198,12 +198,12 @@ class App extends React.Component {
             if (currentWeatherData) {
                 currentWeatherData.push(dataCityWeatherForAdding[0]);
                 this.setState({cities: currentWeatherData});
-                localStorage.setItem(keyForLocalStorage, JSON.stringify(currentWeatherData));
+                localStorage.setItem(LOCAL_STORAGE_DATA_KEY, JSON.stringify(currentWeatherData));
                 return currentWeatherData
             } else {
                 currentWeatherData = dataCityWeatherForAdding;
                 this.setState({cities: currentWeatherData});
-                localStorage.setItem(keyForLocalStorage, JSON.stringify(currentWeatherData));
+                localStorage.setItem(LOCAL_STORAGE_DATA_KEY, JSON.stringify(currentWeatherData));
                 return currentWeatherData
             }
         };
@@ -230,7 +230,7 @@ class App extends React.Component {
             }
             updateDataForAllCities.push(newWeatherData);
         }
-        localStorage.setItem(keyForLocalStorage, JSON.stringify(updateDataForAllCities));
+        localStorage.setItem(LOCAL_STORAGE_DATA_KEY, JSON.stringify(updateDataForAllCities));
         this.setState({cities: updateDataForAllCities});
         if (callback) callback();
     }
@@ -294,7 +294,7 @@ class App extends React.Component {
         let newSource = JSON.parse(JSON.stringify(source));
         if (newSource["gismeteoFlag"] === true || newSource["weatherFlag"] === true) {
             newSource["yandexFlag"] = !newSource["yandexFlag"];
-            localStorage.setItem(keyForLocalStorageFoSource, JSON.stringify(newSource));
+            localStorage.setItem(LOCAL_STORAGE_SOURCE_KEY, JSON.stringify(newSource));
             this.setState({source: newSource});
         }
     }
@@ -303,7 +303,7 @@ class App extends React.Component {
         let source = this.state.source;
         let newSource = JSON.parse(JSON.stringify(source));
         newSource["downloadsTime"] = !newSource["downloadsTime"];
-        localStorage.setItem(keyForLocalStorageFoSource, JSON.stringify(newSource));
+        localStorage.setItem(LOCAL_STORAGE_SOURCE_KEY, JSON.stringify(newSource));
         this.setState({source: newSource});
     }
 
@@ -312,7 +312,7 @@ class App extends React.Component {
         let newSource = JSON.parse(JSON.stringify(source));
         if (newSource["yandexFlag"] === true || newSource["weatherFlag"] === true) {
             newSource["gismeteoFlag"] = !newSource["gismeteoFlag"];
-            localStorage.setItem(keyForLocalStorageFoSource, JSON.stringify(newSource));
+            localStorage.setItem(LOCAL_STORAGE_SOURCE_KEY, JSON.stringify(newSource));
             this.setState({source: newSource});
         }
     }
@@ -322,7 +322,7 @@ class App extends React.Component {
         let newSource = JSON.parse(JSON.stringify(source));
         if (newSource["gismeteoFlag"] === true || newSource["yandexFlag"] === true) {
             newSource["weatherFlag"] = !newSource["weatherFlag"];
-            localStorage.setItem(keyForLocalStorageFoSource, JSON.stringify(newSource));
+            localStorage.setItem(LOCAL_STORAGE_SOURCE_KEY, JSON.stringify(newSource));
             this.setState({source: newSource});
         }
     }
