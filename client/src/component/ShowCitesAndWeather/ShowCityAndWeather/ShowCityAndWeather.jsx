@@ -85,8 +85,7 @@ class ShowCityAndWeather extends React.Component {
                 <div className="information_position">
                     <button type="button" onClick={this.deleteCity.bind(this)}>&times;</button>
                     <div className="spinner_position">
-                        {this.state.spinnerOnThreeDays ? <Spinner/> : null}
-                        {this.props.spinnerOnThreeDays ? <Spinner/> : null}
+                        {this.state.spinnerOnThreeDays || this.props.spinnerOnThreeDays ? <Spinner/> : null}
                     </div>
                 </div>
                 <div onClick={this.onClickShowThreeDaysWeather.bind(this)}>
