@@ -1,7 +1,10 @@
 const cheerio = require('cheerio');
 const request = require('sync-request');
 const fs = require("fs");
+const constants = require('../../constant-list');
 let path = __dirname + '/weathercom-current-cache.json';
+const weatherComKey = `,&APPID=0b58b5094eddd4fdfa4a1fe10ca5034e`;
+const weatherAPIRequest = `https://api.openweathermap.org/data/2.5/weather?q=`;
 
 function getCurrentWeathercomData(city) {
     let cityData = {};
@@ -13,12 +16,10 @@ function getCurrentWeathercomData(city) {
     }
     let realTime = new Date().getTime();
     if (!cacheData[city] || (cacheData[city]["lastUpdated"] - realTime) > 3600000) {
-        const weatherAPIRequest = `https://api.openweathermap.org/data/2.5/weather?q=`;
-        const weatherComKey = `,&APPID=0b58b5094eddd4fdfa4a1fe10ca5034e`;
         let url = encodeURI(`${weatherAPIRequest}${city}${weatherComKey}`);
         let res = request('GET', url);
         if (res.statusCode!==200){
-           return  {temp: "Данных нет", humidity: "Данных нет"};
+            return {temp: constants.noData, humidity: constants.noData};
         }
         let $ = (cheerio.load(res.getBody()));
         let jsonData = $.text();
