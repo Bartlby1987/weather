@@ -82,21 +82,21 @@ class ShowCityAndWeather extends React.Component {
         let showThreeDaysWeather = this.props.weather && this.props.weather.threeDayWeatherStatus && this.props.weather.threeDayData;
         let cityData =
             <div className="div_border_city ">
-                <div className="square">
+                <div className="information_position">
                     <button type="button" onClick={this.deleteCity.bind(this)}>&times;</button>
-                    <div className="square_2">
+                    <div className="spinner_position">
                         {this.state.spinnerOnThreeDays ? <Spinner/> : null}
                         {this.props.spinnerOnThreeDays ? <Spinner/> : null}
                     </div>
                 </div>
                 <div onClick={this.onClickShowThreeDaysWeather.bind(this)}>
-                    <div className={"margin_3"}>
+                    <div className="time_position">
                         {this.state.timeOn ? <div>{this.props.weather.loadCityTime}</div> : null}
                     </div>
                     <h5>
                         Город {city}
                     </h5>
-                    <div className="margin">
+                    <div className="city_data_position">
                         <table border="1" align="center" className="table_size_current">
                             <tbody>
                             <tr>
@@ -128,7 +128,7 @@ class ShowCityAndWeather extends React.Component {
                             </tbody>
                         </table>
                     </div>
-                    <div className="margin_2">
+                    <div className="forecast_data_position">
                         <div className={showThreeDaysWeather ? "section" : "section collapsed"}>
                             <ThreeDaysWeather threeDaysWeather={this.props.weather.threeDayData}/>
                         </div>

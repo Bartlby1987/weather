@@ -1,4 +1,4 @@
-.checkbox_style_1 {
+.props_time_position {
     margin-bottom: 2em;
 }
 
@@ -7,7 +7,7 @@ h3 {
     text-decoration: underline
 }
 
-.div_border2{
-    padding:1em ;
-    display:inline-block;
+.props_data_position {
+    padding: 1em;
+    display: inline-block;
 }

@@ -5,8 +5,8 @@ class AddAndDeleteCity extends React.Component {
 
     render() {
         return (
-            <div className="div_border2">
-                <div className="checkbox_style_1">
+            <div className="props_data_position">
+                <div className="props_time_position">
                     <div><h3>Выберите сайт для отображения погоды</h3></div>
                     <div>
                         <div className="custom-control custom-checkbox">

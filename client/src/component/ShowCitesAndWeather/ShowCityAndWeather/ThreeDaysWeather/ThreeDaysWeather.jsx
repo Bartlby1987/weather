@@ -83,7 +83,7 @@ class ThreeDaysWeather extends React.Component {
                 <h5>
                     Прогноз на три дня.
                 </h5>
-                <table border="1" align="center" className="margin_2 table_size">
+                <table border="1" align="center" className="forecast_data_position table_size">
                     <tbody>
                     <tr>
                         <th>Д/Н</th>

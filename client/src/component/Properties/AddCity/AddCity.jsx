@@ -60,7 +60,8 @@ class AddCity extends React.Component {
                         <button type="submit" className="btn btn-primary mb-2 margin_button"
                                 disabled={disableButton}
                                 onClick={this.onClickAddCity}>
-                            {this.state.spinnerOn ? <div className="position"><Spinner/></div> : <div>Добавить</div>}
+                            {this.state.spinnerOn ? <div className="position_button"><Spinner/></div> :
+                                <div>Добавить</div>}
                         </button>
                         <button type="submit" className="btn btn-primary mb-2 margin_button form-inline"
                                 onClick={this.onClickRefreshCityData}
