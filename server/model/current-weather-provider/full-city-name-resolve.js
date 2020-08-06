@@ -8,9 +8,9 @@ function getFullCityNameResolve(addCity) {
     URL = encodeURI(URL);
     let res = request('GET', URL, {});
     let $ = cheerio.load(res.body);
-    let file = $(pageSelector).text();
-    file = file.split(",")[0];
-    return file
+    let cityNameFromYandexPage = $(pageSelector).text();
+    cityNameFromYandexPage = cityNameFromYandexPage.split(",")[0];
+    return cityNameFromYandexPage
 }
 
 module.exports = {

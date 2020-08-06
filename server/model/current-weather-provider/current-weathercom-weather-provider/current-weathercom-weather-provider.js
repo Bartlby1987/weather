@@ -3,8 +3,8 @@ const request = require('sync-request');
 const fs = require("fs");
 const constants = require('../../constant-list');
 let path = __dirname + '/weathercom-current-cache.json';
-const weatherComKey = `,&APPID=0b58b5094eddd4fdfa4a1fe10ca5034e`;
-const weatherAPIRequest = `https://api.openweathermap.org/data/2.5/weather?q=`;
+const WEATHER_COM_KEY = `,&APPID=0b58b5094eddd4fdfa4a1fe10ca5034e`;
+const WEATHER_API_REQUEST = `https://api.openweathermap.org/data/2.5/weather?q=`;
 
 function getCurrentWeathercomData(city) {
     let cityData = {};
@@ -16,7 +16,7 @@ function getCurrentWeathercomData(city) {
     }
     let realTime = new Date().getTime();
     if (!cacheData[city] || (cacheData[city]["lastUpdated"] - realTime) > 3600000) {
-        let url = encodeURI(`${weatherAPIRequest}${city}${weatherComKey}`);
+        let url = encodeURI(`${WEATHER_API_REQUEST}${city}${WEATHER_COM_KEY}`);
         let res = request('GET', url);
         if (res.statusCode!==200){
             return {temp: constants.noData, humidity: constants.noData};
