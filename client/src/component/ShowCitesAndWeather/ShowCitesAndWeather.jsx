@@ -4,7 +4,6 @@ import AddCity from "../Properties/AddCity/AddCity";
 import "./ShowCitesAndWeather.css";
 
 class ShowCitesAndWeather extends React.Component {
-
     render() {
         let showCityAndWeather = [];
         let deleteCity = this.props.delete;
