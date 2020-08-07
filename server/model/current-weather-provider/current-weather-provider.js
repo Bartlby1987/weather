@@ -3,6 +3,8 @@ const yandexProvider = require('./current-yandex-weather-provider/current-yandex
 const gismeteoProvider = require('./current-gismeteo-weather-provider/current-gismeteo-weather-provider.js');
 const cityNameResolve = require("./full-city-name-resolve");
 const commonUtilities = require("../common-utilities");
+const constants = require('../constant-list');
+
 const mappingProvider = {
     "yandex": yandexProvider,
     "gismeteo": gismeteoProvider,
@@ -21,7 +23,7 @@ function createCityWeatherData(addCity, sources) {
             cityData[source] = provider.getWeather(addCity)
         } catch (e) {
             commonUtilities.logDataLoadingError(source, e);
-            cityData[source] = {temp: "Нет данных", humidity: "Нет данных"}
+            cityData[source] = {temp: constants.NO_DATA, humidity: constants.NO_DATA}
         }
     }
     cityData["loadCityTime"] = getLoadDataTime();
