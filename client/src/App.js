@@ -209,6 +209,7 @@ class App extends React.Component {
         };
         return sendPostIPARequest(JSON.stringify(citiesData));
     }
+
     async onClickRefreshData(callback) {
         let citiesAndSource = this.createDataListForRefreshInformation();
         let newWeather = await (await this.getNewDataForCity(citiesAndSource));
@@ -355,7 +356,7 @@ class App extends React.Component {
                 />
             </div>;
         } else {
-            information = <div className="zoom">
+            information = <div className="all_information_zoom">
                 <NavBar onClickRefresheData={this.onClickRefreshData.bind(this)} source={this.state.source}
                         changeSpinnerStatus={this.changeSpinnerStatus.bind(this)}/>
                 <Route exact path="/" render={() =>

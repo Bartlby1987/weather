@@ -37,7 +37,7 @@ class NavBar extends React.Component {
                         </div>
                     </Link>
                     <Link to="/Properties">
-                        <div className="padding">
+                        <div className="padding_button">
                             <button className="btn btn-outline-success" type="button">Настройки</button>
                         </div>
                     </Link>

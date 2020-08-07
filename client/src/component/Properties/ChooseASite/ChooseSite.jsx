@@ -5,8 +5,8 @@ class AddAndDeleteCity extends React.Component {
 
     render() {
         return (
-            <div>
-                <div className="checkbox_style_1">
+            <div className="props_data_position">
+                <div className="props_time_position">
                     <div><h3>Выберите сайт для отображения погоды</h3></div>
                     <div>
                         <div className="custom-control custom-checkbox">
@@ -30,7 +30,7 @@ class AddAndDeleteCity extends React.Component {
                         </div>
                     </div>
                 </div>
-                <div className="checkbox_style_2">
+                <div>
                     <div><h3>Включение отображения времени загрузки</h3></div>
                     <div className="custom-control custom-checkbox ">
                         <input type="checkbox" className="custom-control-input" id="defaultInline4"
@@ -40,7 +40,7 @@ class AddAndDeleteCity extends React.Component {
                         </label>
                     </div>
                 </div>
-            </div>
+                </div>
         );
     }
 }

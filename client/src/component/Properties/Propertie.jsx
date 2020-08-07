@@ -6,7 +6,7 @@ class Propertie extends React.Component {
 
     render() {
         return (
-            <div className="parent">
+            <div className="all_props_position">
                 <ChooseSite yandexFlag={this.props.yandexFlag} gismeteoFlag={this.props.gismeteoFlag}
                             weatherFlag={this.props.weatherFlag} onOrOffSourceYandex={this.props.onOrOffSourceYandex}
                             onOrOffSourceGismeteo={this.props.onOrOffSourceGismeteo}

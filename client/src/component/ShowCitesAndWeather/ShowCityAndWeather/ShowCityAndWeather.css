@@ -1,9 +1,9 @@
-.square {
+.information_position {
     position: absolute;
-    left: 21em;
+    left: 22em;
 }
 
-.square_2 {
+.spinner_position {
     position: absolute;
     left: 0.2em;
     zoom: 1.4;
@@ -11,36 +11,38 @@
 
 
 @media screen and (max-width: 599px) {
-    .square {
+    .information_position {
         position: absolute;
         left: 90%;
     }
 }
 
 @media screen and (max-width: 200px) {
-    .square {
+    .information_position {
         position: absolute;
         left: 85%;
     }
 }
 
 @media screen and (max-width: 72px) {
-    .square {
+    .information_position {
         position: absolute;
         left: 87%;
     }
 }
 
-.margin {
+.city_data_position {
     margin-top: 2em
 }
 
-.margin_2 {
-    margin-top: 1em
+.forecast_data_position {
+    margin-top: 2em
 }
 
-.margin_3 {
-    margin-right: 4em
+.time_position {
+    margin-right: 4em;
+    margin-bottom: 0.6em;
+
 }
 
 .table_size_current {
