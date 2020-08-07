@@ -4,6 +4,8 @@ import ThreeDaysWeather from "./ThreeDaysWeather/ThreeDaysWeather";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Spinner from "../../Spinner/Spinner";
 
+const DATA_NOT_AVAILABLE_TEXT = "Данных нет";
+
 class ShowCityAndWeather extends React.Component {
     constructor(props) {
         super(props);
@@ -55,28 +57,28 @@ class ShowCityAndWeather extends React.Component {
         let weatherComTemp;
         let weatherComHumidity;
         if (this.props.source.yandexFlag === false || weatherData.yandex === undefined) {
-            yandexTemp = "Данных нет";
-            yandexHumidity = "Данных нет";
+            yandexTemp = DATA_NOT_AVAILABLE_TEXT;
+            yandexHumidity = DATA_NOT_AVAILABLE_TEXT;
         } else {
             yandexTemp = weatherData.yandex.temp;
             yandexHumidity = weatherData.yandex.humidity;
         }
         if (this.props.source.gismeteoFlag === false || weatherData.gismeteo === undefined) {
-            gismeteoTemp = "Данных нет";
-            gismeteoHumidity = "Данных нет";
+            gismeteoTemp = DATA_NOT_AVAILABLE_TEXT;
+            gismeteoHumidity = DATA_NOT_AVAILABLE_TEXT;
         } else {
             gismeteoTemp = weatherData.gismeteo.temp;
             gismeteoHumidity = weatherData.gismeteo.humidity;
         }
         if (this.props.source.weatherFlag === false || weatherData.weatherCom === undefined) {
-            weatherComTemp = "Данных нет";
-            weatherComHumidity = "Данных нет";
+            weatherComTemp = DATA_NOT_AVAILABLE_TEXT;
+            weatherComHumidity = DATA_NOT_AVAILABLE_TEXT;
         } else {
             weatherComTemp = weatherData.weatherCom.temp;
             weatherComHumidity = weatherData.weatherCom.humidity;
             if (weatherComTemp === "0" && weatherComHumidity === "0") {
-                weatherComTemp = "Нет данных";
-                weatherComHumidity = "Нет данных";
+                weatherComTemp = DATA_NOT_AVAILABLE_TEXT
+                weatherComHumidity = DATA_NOT_AVAILABLE_TEXT;
             }
         }
         let showThreeDaysWeather = this.props.weather && this.props.weather.threeDayWeatherStatus && this.props.weather.threeDayData;

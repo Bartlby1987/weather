@@ -7,11 +7,14 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import {Route} from 'react-router-dom';
 import Popup from "./component/ShowCitesAndWeather/ShowCityAndWeather/PopUp/PopUp";
 
+const LOCAL_STORAGE_DATA_KEY = 'CitiesData';
+const LOCAL_STORAGE_SOURCE_KEY = 'Source';
+
 class App extends React.Component {
     constructor(props) {
         super(props);
-        let data = localStorage.getItem('CitiesData');
-        let source = localStorage.getItem('Source');
+        let data = localStorage.getItem(LOCAL_STORAGE_DATA_KEY);
+        let source = localStorage.getItem(LOCAL_STORAGE_SOURCE_KEY);
         if (!JSON.parse(source)) {
             source = {
                 yandexFlag: true,
@@ -25,7 +28,8 @@ class App extends React.Component {
         try {
             data = JSON.parse(data);
         } catch (e) {
-            console.log('unable to load data from local storage. Looking to Moscow');
+            const localStorageErrorMessage = 'unable to load data from local storage.';
+            console.log(localStorageErrorMessage);
             console.log('error:' + e);
             data = [];
         }
@@ -130,21 +134,19 @@ class App extends React.Component {
             }
         }
         this.setState({cities: newCitiesData});
-        localStorage.setItem('CitiesData', JSON.stringify(newCitiesData))
+        localStorage.setItem(LOCAL_STORAGE_DATA_KEY, JSON.stringify(newCitiesData))
     }
 
 //todo this function is analogue addCityFunction.
-    getNewDataForCity(city) {
+    getNewDataForCity(citiesAndSource) {
         const url = "weather/current";
-        let citiesData = this.createUpdatedCitiesList(city);
-        citiesData["cities"] = [city];
-        const sendPostIPARequest = async (citiesData) => {
+        const sendPostIPARequest = async (citiesAndSource) => {
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(citiesData)
+                body: JSON.stringify(citiesAndSource)
             });
             if (!response.ok) {
                 this.changeSpinnerStatus(false);
@@ -156,7 +158,7 @@ class App extends React.Component {
                 return await response.json();
             }
         };
-        return sendPostIPARequest(citiesData);
+        return sendPostIPARequest(citiesAndSource);
     }
 
 //todo the logic in this function should be split
@@ -196,61 +198,40 @@ class App extends React.Component {
             if (currentWeatherData) {
                 currentWeatherData.push(dataCityWeatherForAdding[0]);
                 this.setState({cities: currentWeatherData});
-                localStorage.setItem('CitiesData', JSON.stringify(currentWeatherData));
+                localStorage.setItem(LOCAL_STORAGE_DATA_KEY, JSON.stringify(currentWeatherData));
                 return currentWeatherData
             } else {
                 currentWeatherData = dataCityWeatherForAdding;
                 this.setState({cities: currentWeatherData});
-                localStorage.setItem('CitiesData', JSON.stringify(currentWeatherData));
+                localStorage.setItem(LOCAL_STORAGE_DATA_KEY, JSON.stringify(currentWeatherData));
                 return currentWeatherData
             }
         };
         return sendPostIPARequest(JSON.stringify(citiesData));
     }
-
-    // async onClickRefreshData(city, callback) {
-    //     if (!(await this.getNewDataForCity(city))) {
-    //         return
-    //     }
-    //     let updateDataForAllCities = [];
-    //     let cloneDataForAllCity = JSON.parse(JSON.stringify(this.state.cities));
-    //     for (let i = 0; i < cloneDataForAllCity.length; i++) {
-    //         city = cloneDataForAllCity[i]["city"];
-    //         let newWeather = await this.onClickAddCity(city);
-    //         if (cloneDataForAllCity[i]["threeDayWeatherStatus"]) {
-    //             newWeather[0]["threeDayWeatherStatus"] = true;
-    //             newWeather[0]["threeDayData"] = (await this.getWeatherOnThreeDays(city));
-    //         }
-    //         updateDataForAllCities.push(newWeather[0]);
-    //     }
-    //     if (callback) callback();
-    //     this.setState({cities: updateDataForAllCities});
-    // }
     async onClickRefreshData(callback) {
-// todo no need other request.
-        if (!(await this.getNewDataForCity(''))) {
-            return
-        }
         let citiesAndSource = this.createDataListForRefreshInformation();
-        if (!citiesAndSource) {
+        let newWeather = await (await this.getNewDataForCity(citiesAndSource));
+        if (!citiesAndSource || !newWeather) {
             return
         }
-        let newWeather = await this.onClickAddCity(citiesAndSource);
         let updateDataForAllCities = [];
         let cloneDataForAllCity = JSON.parse(JSON.stringify(this.state.cities));
         for (let i = 0; i < newWeather.length; i++) {
             let newWeatherData = newWeather[i];
             for (let j = 0; j < cloneDataForAllCity.length; j++) {
                 let cloneData = cloneDataForAllCity[i];
-                if (cloneData["city"] === newWeatherData["city"] && cloneData["threeDayWeatherStatus"])
+                if (cloneData["city"] === newWeatherData["city"] && cloneData["threeDayWeatherStatus"]) {
                     newWeatherData["threeDayWeatherStatus"] = true;
 //todo it is to many requests. It must be just one with all cities.
-                newWeatherData["threeDayData"] = (await this.getWeatherOnThreeDays(cloneData["city"]));
+                    newWeatherData["threeDayData"] = (await this.getWeatherOnThreeDays(cloneData["city"]));
+                }
             }
             updateDataForAllCities.push(newWeatherData);
         }
-        if (callback) callback();
+        localStorage.setItem(LOCAL_STORAGE_DATA_KEY, JSON.stringify(updateDataForAllCities));
         this.setState({cities: updateDataForAllCities});
+        if (callback) callback();
     }
 
     setThreeDayWeatherData(dateWeatherForThreeDay, city) {
@@ -312,7 +293,7 @@ class App extends React.Component {
         let newSource = JSON.parse(JSON.stringify(source));
         if (newSource["gismeteoFlag"] === true || newSource["weatherFlag"] === true) {
             newSource["yandexFlag"] = !newSource["yandexFlag"];
-            localStorage.setItem('Source', JSON.stringify(newSource));
+            localStorage.setItem(LOCAL_STORAGE_SOURCE_KEY, JSON.stringify(newSource));
             this.setState({source: newSource});
         }
     }
@@ -321,7 +302,7 @@ class App extends React.Component {
         let source = this.state.source;
         let newSource = JSON.parse(JSON.stringify(source));
         newSource["downloadsTime"] = !newSource["downloadsTime"];
-        localStorage.setItem('Source', JSON.stringify(newSource));
+        localStorage.setItem(LOCAL_STORAGE_SOURCE_KEY, JSON.stringify(newSource));
         this.setState({source: newSource});
     }
 
@@ -330,7 +311,7 @@ class App extends React.Component {
         let newSource = JSON.parse(JSON.stringify(source));
         if (newSource["yandexFlag"] === true || newSource["weatherFlag"] === true) {
             newSource["gismeteoFlag"] = !newSource["gismeteoFlag"];
-            localStorage.setItem('Source', JSON.stringify(newSource));
+            localStorage.setItem(LOCAL_STORAGE_SOURCE_KEY, JSON.stringify(newSource));
             this.setState({source: newSource});
         }
     }
@@ -340,7 +321,7 @@ class App extends React.Component {
         let newSource = JSON.parse(JSON.stringify(source));
         if (newSource["gismeteoFlag"] === true || newSource["yandexFlag"] === true) {
             newSource["weatherFlag"] = !newSource["weatherFlag"];
-            localStorage.setItem('Source', JSON.stringify(newSource));
+            localStorage.setItem(LOCAL_STORAGE_SOURCE_KEY, JSON.stringify(newSource));
             this.setState({source: newSource});
         }
     }
