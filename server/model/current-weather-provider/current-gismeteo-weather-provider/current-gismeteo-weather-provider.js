@@ -11,7 +11,7 @@ const PATH_OF_GISMETEO_PAGE = "now/";
 
 function getCurrentGismeteoData(cityName) {
     let citiesObject = cityAndPageObject.transformStringInObject(cityName, GISMETEO_SEARCH_PAGE);
-    let cityData = {temp: constants.noData, humidity: constants.noData};
+    let cityData = {temp: constants.NO_DATA, humidity: constants.NO_DATA};
     for (let city in citiesObject) {
         let URL1 = citiesObject[city];
         let res1 = request('GET', URL1, {});

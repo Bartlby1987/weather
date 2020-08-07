@@ -23,7 +23,7 @@ function createCityWeatherData(addCity, sources) {
             cityData[source] = provider.getWeather(addCity)
         } catch (e) {
             commonUtilities.logDataLoadingError(source, e);
-            cityData[source] = {temp: constants.noData, humidity: constants.noData}
+            cityData[source] = {temp: constants.NO_DATA, humidity: constants.NO_DATA}
         }
     }
     cityData["loadCityTime"] = getLoadDataTime();

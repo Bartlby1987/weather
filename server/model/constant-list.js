@@ -1,5 +1,5 @@
 module.exports =
     {
-        "noData": "Данных нет",
+        "NO_DATA": "Данных нет",
     }
 

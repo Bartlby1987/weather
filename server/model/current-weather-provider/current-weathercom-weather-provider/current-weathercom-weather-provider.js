@@ -19,7 +19,7 @@ function getCurrentWeathercomData(city) {
         let url = encodeURI(`${WEATHER_API_REQUEST}${city}${WEATHER_COM_KEY}`);
         let res = request('GET', url);
         if (res.statusCode!==200){
-            return {temp: constants.noData, humidity: constants.noData};
+            return {temp: constants.NO_DATA, humidity: constants.NO_DATA};
         }
         let $ = (cheerio.load(res.getBody()));
         let jsonData = $.text();
