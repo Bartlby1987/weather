@@ -3,15 +3,15 @@ const cheerio = require('cheerio');
 const forecastWeatherUtilities = require("../forecast-weather-utilities");
 const YANDEX_PAGE = `https://yandex.ru/pogoda/search?request=`;
 const DETAIL_YANDEX_PAGE = "https://yandex.ru/pogoda/segment/details?via=srp&cameras=0&geoid=";
-const TEMP_DAY_FIRST_SELECTOR = "body > div > div:nth-child(";
-const TEMP_DAY_SECOND_SELECTOR = ") > dd > table > tbody > tr:nth-child(2) > td.weather-table__body-cell.weather-table__body-cell_type_feels-like > div";
-const TEMP_NIGHT_FIRST_SELECTOR = "body > div > div:nth-child(";
-const TEMP_NIGHT_SECOND_SELECTOR = ") > dd > table > tbody > tr:nth-child(4) > td.weather-table__body-cell.weather-table__body-cell_type_feels-like > div";
-const HUMIDITY_DAY_FIRST_SELECTOR = "body > div > div:nth-child(";
-const HUMIDITY_DAY_SECOND_SELECTOR = ") > dd > table > tbody > tr:nth-child(2) > td.weather-table__body-cell.weather-table__body-cell_type_condition";
 const HREF_ATR_SELECTOR = "body > div > div> div> div > div> div > li:nth-child(1) > a";
-const HUMIDITY_NIGHT_FIRST_SELECTOR = "body > div > div:nth-child(";
-const HUMIDITY_NIGHT_SECOND_SELECTOR = ") > dd > table > tbody > tr:nth-child(4) > td.weather-table__body-cell.weather-table__body-cell_type_condition";
+const generateFirstDaySelector = (value) => `body > div > div:nth-child(${value}) > dd > table > tbody > tr:nth-child(2) > 
+                                         td.weather-table__body-cell.weather-table__body-cell_type_feels-like > div`
+const generateSecondDaySelector = (value) => `body > div > div:nth-child(${value}) > dd > table > tbody > tr:nth-child(4) > 
+                                          td.weather-table__body-cell.weather-table__body-cell_type_feels-like > div`
+const generateHumidityDaySelector = (value) => `body > div > div:nth-child(${value}) > dd > table > tbody > tr:nth-child(2) 
+                                           > td.weather-table__body-cell.weather-table__body-cell_type_condition`
+const generateHumidityNightSelector = (value) => `body > div > div:nth-child(${value}) > dd > table > tbody > tr:nth-child(4) 
+                                             > td.weather-table__body-cell.weather-table__body-cell_type_condition`
 const FIRST_DAY_VALUE = 2;
 const SECOND_DAY_VALUE = 4;
 const THIRD_DAY_VALUE = 5;
@@ -31,7 +31,7 @@ function getYandexDataWeatherForThreeDay(city) {
     let HTMLDetailYandexPage = cheerio.load(rest.body);
 
     function getTempDay(dayValue) {
-        let tempDay = HTMLDetailYandexPage(TEMP_DAY_FIRST_SELECTOR + dayValue + TEMP_DAY_SECOND_SELECTOR).text();
+        let tempDay = HTMLDetailYandexPage(generateFirstDaySelector(dayValue)).text();
         if (tempDay === "") {
             return undefined
         } else {
@@ -40,7 +40,7 @@ function getYandexDataWeatherForThreeDay(city) {
     }
 
     function getTempNight(dayValue) {
-        let tempNight = HTMLDetailYandexPage(TEMP_NIGHT_FIRST_SELECTOR + dayValue + TEMP_NIGHT_SECOND_SELECTOR).text();
+        let tempNight = HTMLDetailYandexPage(generateSecondDaySelector(dayValue)).text();
         if (tempNight === "") {
             return undefined
         } else {
@@ -49,11 +49,11 @@ function getYandexDataWeatherForThreeDay(city) {
     }
 
     function getHumidityDay(dayValue) {
-        return HTMLDetailYandexPage(HUMIDITY_DAY_FIRST_SELECTOR + dayValue + HUMIDITY_DAY_SECOND_SELECTOR).text();
+        return HTMLDetailYandexPage(generateHumidityDaySelector(dayValue)).text();
     }
 
     function getHumidityNight(dayValue) {
-        return HTMLDetailYandexPage(HUMIDITY_NIGHT_FIRST_SELECTOR + dayValue + HUMIDITY_NIGHT_SECOND_SELECTOR).text();
+        return HTMLDetailYandexPage(generateHumidityNightSelector(dayValue)).text();
     }
     return [
         {
@@ -80,4 +80,3 @@ function getYandexDataWeatherForThreeDay(city) {
 module.exports = {
     getForecastWeather: getYandexDataWeatherForThreeDay
 };
-
