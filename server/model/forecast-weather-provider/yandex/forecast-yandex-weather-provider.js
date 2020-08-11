@@ -12,21 +12,26 @@ const HUMIDITY_DAY_SECOND_SELECTOR = ") > dd > table > tbody > tr:nth-child(2) >
 const HREF_ATR_SELECTOR = "body > div > div> div> div > div> div > li:nth-child(1) > a";
 const HUMIDITY_NIGHT_FIRST_SELECTOR = "body > div > div:nth-child(";
 const HUMIDITY_NIGHT_SECOND_SELECTOR = ") > dd > table > tbody > tr:nth-child(4) > td.weather-table__body-cell.weather-table__body-cell_type_condition";
+const FIRST_DAY_VALUE = 2;
+const SECOND_DAY_VALUE = 4;
+const THIRD_DAY_VALUE = 5;
+const STRING_BREAK_SIGN = "°";
+const FIRST_STRING_ELEMENT = 0;
 
 function getYandexDataWeatherForThreeDay(city) {
     let yandexPage = YANDEX_PAGE + city;
     yandexPage = encodeURI(yandexPage);
     let res = request('GET', yandexPage, {});
-    let $$ = cheerio.load(res.body);
-    let href = JSON.stringify($$(HREF_ATR_SELECTOR).attr("href"));
-    let cityNumber = href.split("/")[2].split("?")[0];
+    let HTMLYandexPage = cheerio.load(res.body);
+    let href = HTMLYandexPage(HREF_ATR_SELECTOR).attr("href");
+    let cityNumber = href.replace(/\D/g, '');
     let detailWeatherPage = DETAIL_YANDEX_PAGE + cityNumber;
     detailWeatherPage = encodeURI(detailWeatherPage);
     let rest = request('GET', detailWeatherPage, {});
-    let $ = cheerio.load(rest.body);
+    let HTMLDetailYandexPage = cheerio.load(rest.body);
 
     function getTempDay(dayValue) {
-        let tempDay = $(TEMP_DAY_FIRST_SELECTOR + dayValue + TEMP_DAY_SECOND_SELECTOR).text();
+        let tempDay = HTMLDetailYandexPage(TEMP_DAY_FIRST_SELECTOR + dayValue + TEMP_DAY_SECOND_SELECTOR).text();
         if (tempDay === "") {
             return undefined
         } else {
@@ -35,7 +40,7 @@ function getYandexDataWeatherForThreeDay(city) {
     }
 
     function getTempNight(dayValue) {
-        let tempNight = $(TEMP_NIGHT_FIRST_SELECTOR + dayValue + TEMP_NIGHT_SECOND_SELECTOR).text();
+        let tempNight = HTMLDetailYandexPage(TEMP_NIGHT_FIRST_SELECTOR + dayValue + TEMP_NIGHT_SECOND_SELECTOR).text();
         if (tempNight === "") {
             return undefined
         } else {
@@ -44,31 +49,30 @@ function getYandexDataWeatherForThreeDay(city) {
     }
 
     function getHumidityDay(dayValue) {
-        return $(HUMIDITY_DAY_FIRST_SELECTOR + dayValue + HUMIDITY_DAY_SECOND_SELECTOR).text();
+        return HTMLDetailYandexPage(HUMIDITY_DAY_FIRST_SELECTOR + dayValue + HUMIDITY_DAY_SECOND_SELECTOR).text();
     }
 
     function getHumidityNight(dayValue) {
-        return $(HUMIDITY_NIGHT_FIRST_SELECTOR + dayValue + HUMIDITY_NIGHT_SECOND_SELECTOR).text();
+        return HTMLDetailYandexPage(HUMIDITY_NIGHT_FIRST_SELECTOR + dayValue + HUMIDITY_NIGHT_SECOND_SELECTOR).text();
     }
-
     return [
         {
-            tempDay: Number((getTempDay(2)).split("°")[0]),
-            tempNight: Number((getTempNight(2)).split("°")[0]),
-            humidityDay: forecastWeatherUtilities.getTransformHumidity(getHumidityDay(2)),
-            humidityNight: forecastWeatherUtilities.getTransformHumidity(getHumidityNight(2))
+            tempDay: Number((getTempDay(FIRST_DAY_VALUE)).split(STRING_BREAK_SIGN)[FIRST_STRING_ELEMENT]),
+            tempNight: Number((getTempNight(FIRST_DAY_VALUE)).split(STRING_BREAK_SIGN)[FIRST_STRING_ELEMENT]),
+            humidityDay: forecastWeatherUtilities.getTransformHumidity(getHumidityDay(FIRST_DAY_VALUE)),
+            humidityNight: forecastWeatherUtilities.getTransformHumidity(getHumidityNight(FIRST_DAY_VALUE))
         },
         {
-            tempDay: Number((getTempDay(4)).split("°")[0]),
-            tempNight: Number((getTempNight(4)).split("°")[0]),
-            humidityDay: forecastWeatherUtilities.getTransformHumidity(getHumidityDay(4)),
-            humidityNight: forecastWeatherUtilities.getTransformHumidity(getHumidityNight(4))
+            tempDay: Number((getTempDay(SECOND_DAY_VALUE)).split(STRING_BREAK_SIGN)[FIRST_STRING_ELEMENT]),
+            tempNight: Number((getTempNight(SECOND_DAY_VALUE)).split(STRING_BREAK_SIGN)[FIRST_STRING_ELEMENT]),
+            humidityDay: forecastWeatherUtilities.getTransformHumidity(getHumidityDay(SECOND_DAY_VALUE)),
+            humidityNight: forecastWeatherUtilities.getTransformHumidity(getHumidityNight(SECOND_DAY_VALUE))
         },
         {
-            tempDay: Number((getTempDay(5)).split("°")[0]),
-            tempNight: Number((getTempNight(5)).split("°")[0]),
-            humidityDay: forecastWeatherUtilities.getTransformHumidity(getHumidityDay(5)),
-            humidityNight: forecastWeatherUtilities.getTransformHumidity(getHumidityNight(5))
+            tempDay: Number((getTempDay(THIRD_DAY_VALUE)).split(STRING_BREAK_SIGN)[FIRST_STRING_ELEMENT]),
+            tempNight: Number((getTempNight(THIRD_DAY_VALUE)).split(STRING_BREAK_SIGN)[FIRST_STRING_ELEMENT]),
+            humidityDay: forecastWeatherUtilities.getTransformHumidity(getHumidityDay(THIRD_DAY_VALUE)),
+            humidityNight: forecastWeatherUtilities.getTransformHumidity(getHumidityNight(THIRD_DAY_VALUE))
         },
     ];
 }
@@ -76,3 +80,4 @@ function getYandexDataWeatherForThreeDay(city) {
 module.exports = {
     getForecastWeather: getYandexDataWeatherForThreeDay
 };
+

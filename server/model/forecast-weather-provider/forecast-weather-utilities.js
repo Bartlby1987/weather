@@ -27,24 +27,7 @@ function calculateAverageValue(str) {
     }
 }
 
-function getTransformHumidityForWeatherCom(humidityData) {
-    humidityData = humidityData.split(" ");
-    for (let i = 0; i < humidityData.length; i++) {
-        let pathDataAboutWeather = humidityData[i].toLowerCase();
-        switch (pathDataAboutWeather) {
-            case "clear":
-                return "Ясно";
-            case "rain" :
-                return "Дождь";
-            case "snow" :
-                return "Снег";
-        }
-    }
-    return "Осадки"
-}
-
-
-function getForecastDateOnSomeAmountOfDays(amountOfDays = 3) {
+function getForecastDate(amountOfDays = 3) {
     let dateArray = [];
     let options = {
         month: 'short',
@@ -69,10 +52,10 @@ function calculateAverageWeatherData(oneDayData, date) {
             "humidityNight": oneDayData[0]["humidity"],
         }
     } else {
-        let tempDay = 0;
-        let tempNight = 0;
-        let humidityDay = "";
-        let humidityNight = "";
+        let tempDay = null;
+        let tempNight = null;
+        let humidityDay = null;
+        let humidityNight = null;
         for (let i = 0; i < oneDayData.length; i++) {
             tempDay = tempDay + oneDayData[i]["tempDay"];
             tempNight = tempNight + oneDayData[i]["tempNight"];
@@ -92,7 +75,6 @@ function calculateAverageWeatherData(oneDayData, date) {
 
 module.exports = {
     getTransformHumidity: getTransformHumidity,
-    getTransformHumidityForWeatherCom: getTransformHumidityForWeatherCom,
-    getForecastDateOnSomeAmountOfDays: getForecastDateOnSomeAmountOfDays,
+    getForecastDate: getForecastDate,
     calculateAverageWeatherData: calculateAverageWeatherData
 };

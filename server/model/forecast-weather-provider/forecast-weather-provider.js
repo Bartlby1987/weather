@@ -14,7 +14,7 @@ function getForecastWeatherData(cityAndSource) {
     let city = cityAndSource.city;
     let requestedSourcesForecast = [];
     let source = cityAndSource.citiesSource;
-    let date = forecastWeatherUtils.getForecastDateOnSomeAmountOfDays();
+    let date = forecastWeatherUtils.getForecastDate();
     for (let key in source) {
         if (source[key]) {
             try {

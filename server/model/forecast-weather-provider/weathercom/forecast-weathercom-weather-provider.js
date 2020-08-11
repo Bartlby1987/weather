@@ -1,12 +1,31 @@
 const request = require('sync-request');
 const cheerio = require('cheerio');
 const fs = require("fs");
-const forecastWeatherUtilities = require("../forecast-weather-utilities");
 let path = __dirname + "/weathercom-forecast-cache.json";
 const API_REQUEST = "https://api.openweathermap.org/data/2.5/weather?q=";
 const ID_KEY = ",&APPID=0b58b5094eddd4fdfa4a1fe10ca5034e";
 const API_REQUEST_FOR_COORDINATES = "https://api.openweathermap.org/data/2.5/onecall?lat=";
 const ID_KEY_FOR_COORDINATES = "&units=metric&exclude=hourly,current,minutely&appid=0b58b5094eddd4fdfa4a1fe10ca5034e";
+const ONE_HOUR_IN_MILLISECONDS = 3600000;
+const FIRST_DAY_VALUE = 1;
+const SECOND_DAY_VALUE = 2;
+const THIRD_DAY_VALUE = 3;
+
+function getTransformHumidityForWeatherCom(humidityData) {
+    humidityData = humidityData.split(" ");
+    for (let i = 0; i < humidityData.length; i++) {
+        let pathDataAboutWeather = humidityData[i].toLowerCase();
+        switch (pathDataAboutWeather) {
+            case "clear":
+                return "Ясно";
+            case "rain" :
+                return "Дождь";
+            case "snow" :
+                return "Снег";
+        }
+    }
+    return "Осадки"
+}
 
 function getWeatherComDataWeatherForThreeDay(city) {
     let oldWeatherComData;
@@ -22,7 +41,7 @@ function getWeatherComDataWeatherForThreeDay(city) {
         oldWeatherComData = JSON.parse(oldWeatherComDataStr);
         oldWeatherComCityData = oldWeatherComData[city];
     }
-    if ((oldWeatherComData) && (oldWeatherComData[city]) && (loadTime - oldWeatherComCityData.loadTime) < 3600000) {
+    if ((oldWeatherComData) && (oldWeatherComData[city]) && (loadTime - oldWeatherComCityData.loadTime) < ONE_HOUR_IN_MILLISECONDS) {
         return oldWeatherComCityData.forecast
     }
     let url = encodeURI(API_REQUEST + city + ID_KEY);
@@ -53,23 +72,23 @@ function getWeatherComDataWeatherForThreeDay(city) {
     let weatherComData = {};
     let forecast =
         [{
-            tempDay: getTempDay(1),
-            tempNight: getTempNight(1),
-            humidity: forecastWeatherUtilities.getTransformHumidityForWeatherCom(getHumidityDay(1)),
+            tempDay: getTempDay(FIRST_DAY_VALUE),
+            tempNight: getTempNight(FIRST_DAY_VALUE),
+            humidity: getTransformHumidityForWeatherCom(getHumidityDay(FIRST_DAY_VALUE)),
             humidityDay: "",
             humidityNight: ""
         },
             {
-                tempDay: getTempDay(2),
-                tempNight: getTempNight(2),
-                humidity: forecastWeatherUtilities.getTransformHumidityForWeatherCom(getHumidityDay(2)),
+                tempDay: getTempDay(SECOND_DAY_VALUE),
+                tempNight: getTempNight(SECOND_DAY_VALUE),
+                humidity: getTransformHumidityForWeatherCom(getHumidityDay(SECOND_DAY_VALUE)),
                 humidityDay: "",
                 humidityNight: ""
             },
             {
-                tempDay: getTempDay(3),
-                tempNight: getTempNight(3),
-                humidity: forecastWeatherUtilities.getTransformHumidityForWeatherCom(getHumidityDay(3)),
+                tempDay: getTempDay(THIRD_DAY_VALUE),
+                tempNight: getTempNight(THIRD_DAY_VALUE),
+                humidity: getTransformHumidityForWeatherCom(getHumidityDay(THIRD_DAY_VALUE)),
                 humidityDay: "",
                 humidityNight: ""
             }];
