@@ -1,10 +1,10 @@
 const request = require('sync-request');
 const cheerio = require('cheerio');
-const forecastWeatherUtilities = require("../forecast-weather-utilities");
-const GISMETEO_SEARCH_PAGE = "https://www.gismeteo.ru/search/";
-const HREF_GISMETEO_SELECTOR = "body > section > div.content_wrap.countries > div > section > div > div > " +
+const forecastWeatherUtils = require("../forecast-weather-utilities");
+const SEARCH_PAGE = "https://www.gismeteo.ru/search/";
+const HREF_SELECTOR = "body > section > div.content_wrap.countries > div > section > div > div > " +
     "div:nth-child(1) > a.catalog_link.link.blue.fontM";
-const generateGismeteoPage = (value) => `https://www.gismeteo.ru${value}3-days/#2-4-days `;
+const generateDataPage = (value) => `https://www.gismeteo.ru${value}3-days/#2-4-days `;
 const generateTempDaySelector = (value) => `body > section > div> div > div> div > div> div> div > div.forecast_scroll > div 
                     > div._line.templine.clearfix > div > div > div:nth-child(${value}) > span.unit.unit_temperature_c`;
 const generateTempNightSelector = (value) => `body > section > div> div > div > div > div> div> div > div> div > 
@@ -20,59 +20,61 @@ const SECOND_DAY_VALUE = 11;
 const SECOND_TEMP_NIGHT_VALUE = 9;
 const THIRD_DAY_VALUE = 15;
 const THIRD_TEMP_NIGHT_VALUE = 13;
+const mappingProvider = [
+    {
+        dayIndex: FIRST_DAY_VALUE,
+        tempNightIndex: FIRST_TEMP_NIGHT_VALUE
+    }, {
+        dayIndex: SECOND_DAY_VALUE,
+        tempNightIndex: SECOND_TEMP_NIGHT_VALUE
+    }, {
+        dayIndex: THIRD_DAY_VALUE,
+        tempNightIndex: THIRD_TEMP_NIGHT_VALUE
+    }
+]
 
-function getGismeteoDataWeatherForThreeDay(city) {
-    let gismeteoSearchPage = GISMETEO_SEARCH_PAGE + city;
-    gismeteoSearchPage = encodeURI(gismeteoSearchPage);
-    let res = request('GET', gismeteoSearchPage, {});
-    let HTMLGismeteoSearchPage = cheerio.load(res.body);
-    let href = JSON.stringify(HTMLGismeteoSearchPage(HREF_GISMETEO_SELECTOR).attr("href"));
-    let gismeteoCityPage = generateGismeteoPage(href);
-    gismeteoCityPage = gismeteoCityPage.replace(/["']/g, '');
-    let rest = request('GET', gismeteoCityPage, {});
-    let HTMLGismeteoPage = cheerio.load(rest.body);
+function getForecastWeather(city) {
+    let searchPage = encodeURI(SEARCH_PAGE + city);
+    let res = request('GET', searchPage, {});
+    let htmlSearchPage = cheerio.load(res.body);
+    let href = JSON.stringify(htmlSearchPage(HREF_SELECTOR).attr("href"));
+    let dataPage = generateDataPage(href);
+    dataPage = dataPage.replace(/["']/g, '');
+    let rest = request('GET', dataPage, {});
+    let htmlPage = cheerio.load(rest.body);
+
     function getTempDay(dayValue) {
-        return HTMLGismeteoPage(generateTempDaySelector(dayValue)).text();
+        return htmlPage(generateTempDaySelector(dayValue)).text();
     }
 
     function getTempNight(dayValue) {
-        return HTMLGismeteoPage(generateTempNightSelector(dayValue)).text();
+        return htmlPage(generateTempNightSelector(dayValue)).text();
     }
 
     function getHumidityDay(dayValue) {
-        return HTMLGismeteoPage(generateHumidityDaySelector(dayValue)).attr(ATTR).trim();
+        const attrValue = htmlPage(generateHumidityDaySelector(dayValue)).attr(ATTR).trim();
+        return parseAttrHumidity(attrValue);
     }
 
     function getHumidityNight(dayValue) {
-        return HTMLGismeteoPage(generateHumidityNightSelector(dayValue)).attr(ATTR).trim();
+        const attrValue = htmlPage(generateHumidityNightSelector(dayValue)).attr(ATTR).trim();
+        return parseAttrHumidity(attrValue);
     }
 
-    function getParsingHumidity(humidityString) {
+    function parseAttrHumidity(humidityString) {
         return humidityString.replace(/[\s,<nobr/>]/g, " ").trim();
     }
 
-    return [
-        {
-            tempDay: Number(getTempDay(FIRST_DAY_VALUE)),
-            tempNight: Number(getTempNight(FIRST_TEMP_NIGHT_VALUE)),
-            humidityDay: forecastWeatherUtilities.getTransformHumidity(getParsingHumidity(getHumidityDay(FIRST_DAY_VALUE))),
-            humidityNight: forecastWeatherUtilities.getTransformHumidity(getParsingHumidity(getHumidityNight(FIRST_DAY_VALUE)))
-        },
-        {
-            tempDay: Number(getTempDay(SECOND_DAY_VALUE)),
-            tempNight: Number(getTempNight(SECOND_TEMP_NIGHT_VALUE)),
-            humidityDay: forecastWeatherUtilities.getTransformHumidity(getParsingHumidity(getHumidityDay(SECOND_DAY_VALUE))),
-            humidityNight: forecastWeatherUtilities.getTransformHumidity(getParsingHumidity(getHumidityNight(SECOND_DAY_VALUE)))
-        },
-        {
-            tempDay: Number(getTempDay(THIRD_DAY_VALUE)),
-            tempNight: Number(getTempNight(THIRD_TEMP_NIGHT_VALUE)),
-            humidityDay: forecastWeatherUtilities.getTransformHumidity(getParsingHumidity(getHumidityDay(THIRD_DAY_VALUE))),
-            humidityNight: forecastWeatherUtilities.getTransformHumidity(getParsingHumidity(getHumidityNight(THIRD_DAY_VALUE)))
-        },
-    ]
+    return mappingProvider.map((element) => {
+        return {
+            tempDay: Number(getTempDay(element.dayIndex)),
+            tempNight: Number(getTempNight(element.tempNightIndex)),
+            humidityDay: forecastWeatherUtils.getTransformHumidity(getHumidityDay(element.dayIndex)),
+            humidityNight: forecastWeatherUtils.getTransformHumidity(getHumidityNight(element.dayIndex))
+        }
+    })
 }
 
 module.exports = {
-    getForecastWeather: getGismeteoDataWeatherForThreeDay
+    getForecastWeather: getForecastWeather
 };

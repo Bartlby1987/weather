@@ -2,59 +2,62 @@ const request = require('sync-request');
 const cheerio = require('cheerio');
 const fs = require("fs");
 let path = __dirname + "/weathercom-forecast-cache.json";
-const API_REQUEST = "https://api.openweathermap.org/data/2.5/weather?q=";
-const ID_KEY = ",&APPID=0b58b5094eddd4fdfa4a1fe10ca5034e";
-const API_REQUEST_FOR_COORDINATES = "https://api.openweathermap.org/data/2.5/onecall?lat=";
-const ID_KEY_FOR_COORDINATES = "&units=metric&exclude=hourly,current,minutely&appid=0b58b5094eddd4fdfa4a1fe10ca5034e";
-const ONE_HOUR_IN_MILLISECONDS = 3600000;
+const API_REQUEST = (value) => `https://api.openweathermap.org/data/2.5/weather?q=${value},&APPID=
+                            0b58b5094eddd4fdfa4a1fe10ca5034e`
+const API_REQUEST_FOR_COORDINATES = (lat, lon) => `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}
+                                   &units=metric&exclude=hourly,current,minutely&appid=0b58b5094eddd4fdfa4a1fe10ca5034e`
+const CACHE_LIFETIME_LIMIT_IN_MILLISECONDS = 60 * 60 * 1000;
 const FIRST_DAY_VALUE = 1;
 const SECOND_DAY_VALUE = 2;
 const THIRD_DAY_VALUE = 3;
+const mappingProvider = [{"dayIndex": FIRST_DAY_VALUE}, {"dayIndex": SECOND_DAY_VALUE}, {"dayIndex": THIRD_DAY_VALUE}];
+const weatherData = {
+    "clear": "Ясно",
+    "rain": "Дождь",
+    "snow": "Снег"
+}
 
-function getTransformHumidityForWeatherCom(humidityData) {
+function getTransformHumidity(humidityData) {
     humidityData = humidityData.split(" ");
+    let pathDataAboutWeather;
     for (let i = 0; i < humidityData.length; i++) {
-        let pathDataAboutWeather = humidityData[i].toLowerCase();
-        switch (pathDataAboutWeather) {
-            case "clear":
-                return "Ясно";
-            case "rain" :
-                return "Дождь";
-            case "snow" :
-                return "Снег";
+        let humidity = humidityData[i];
+        pathDataAboutWeather = humidity.toLowerCase();
+        if (weatherData.pathDataAboutWeather) {
+            return weatherData.pathDataAboutWeather
         }
     }
     return "Осадки"
 }
 
-function getWeatherComDataWeatherForThreeDay(city) {
-    let oldWeatherComData;
-    let oldWeatherComCityData;
+function getForecastWeather(city) {
+    let oldData;
+    let oldCityData;
     let loadTime = new Date().getTime();
-    let oldWeatherComDataStr;
+    let oldDataStr;
     try {
-        oldWeatherComDataStr = fs.readFileSync(path, 'utf8');
+        oldDataStr = fs.readFileSync(path, 'utf8');
     } catch {
-        oldWeatherComDataStr = "";
+        oldDataStr = "";
     }
-    if (oldWeatherComDataStr !== "") {
-        oldWeatherComData = JSON.parse(oldWeatherComDataStr);
-        oldWeatherComCityData = oldWeatherComData[city];
+    if (oldDataStr !== "") {
+        oldData = JSON.parse(oldDataStr);
+        oldCityData = oldData[city];
     }
-    if ((oldWeatherComData) && (oldWeatherComData[city]) && (loadTime - oldWeatherComCityData.loadTime) < ONE_HOUR_IN_MILLISECONDS) {
-        return oldWeatherComCityData.forecast
+    if ((oldData) && (oldData[city]) && (loadTime - oldCityData.loadTime) < CACHE_LIFETIME_LIMIT_IN_MILLISECONDS) {
+        return oldCityData.forecast
     }
-    let url = encodeURI(API_REQUEST + city + ID_KEY);
+    let url = encodeURI(API_REQUEST(city));
     let res = request('GET', url, {});
-    let $$ = (cheerio.load(res.getBody()));
-    let jsonData = $$.text();
+    let jsonDataAPIForCoordinates = (cheerio.load(res.getBody()));
+    let jsonData = jsonDataAPIForCoordinates.text();
     let jsonObj = JSON.parse(jsonData);
     let lon = jsonObj["coord"]["lon"];
     let lat = jsonObj["coord"]["lat"];
-    let apiRequest = encodeURI(`${API_REQUEST_FOR_COORDINATES}${lat}&lon=${lon}${ID_KEY_FOR_COORDINATES}`);
+    let apiRequest = encodeURI(API_REQUEST_FOR_COORDINATES(lat, lon));
     let rest = request('GET', apiRequest, {});
-    let $ = (cheerio.load(rest.getBody()));
-    let jsonDataRequest = $.text();
+    let jsonDataAPIForWeather = (cheerio.load(rest.getBody()));
+    let jsonDataRequest = jsonDataAPIForWeather.text();
     let jsonObjRequest = JSON.parse(jsonDataRequest);
 
     function getTempDay(dayValue) {
@@ -62,7 +65,7 @@ function getWeatherComDataWeatherForThreeDay(city) {
     }
 
     function getTempNight(dayValue) {
-        return Math.round(Number(jsonObjRequest["daily"][dayValue]["temp"] ["night"]));
+        return Math.round(Number(jsonObjRequest["daily"][dayValue]["temp"]["night"]));
     }
 
     function getHumidityDay(dayValue) {
@@ -70,41 +73,28 @@ function getWeatherComDataWeatherForThreeDay(city) {
     }
 
     let weatherComData = {};
-    let forecast =
-        [{
-            tempDay: getTempDay(FIRST_DAY_VALUE),
-            tempNight: getTempNight(FIRST_DAY_VALUE),
-            humidity: getTransformHumidityForWeatherCom(getHumidityDay(FIRST_DAY_VALUE)),
-            humidityDay: "",
-            humidityNight: ""
-        },
-            {
-                tempDay: getTempDay(SECOND_DAY_VALUE),
-                tempNight: getTempNight(SECOND_DAY_VALUE),
-                humidity: getTransformHumidityForWeatherCom(getHumidityDay(SECOND_DAY_VALUE)),
-                humidityDay: "",
-                humidityNight: ""
-            },
-            {
-                tempDay: getTempDay(THIRD_DAY_VALUE),
-                tempNight: getTempNight(THIRD_DAY_VALUE),
-                humidity: getTransformHumidityForWeatherCom(getHumidityDay(THIRD_DAY_VALUE)),
-                humidityDay: "",
-                humidityNight: ""
-            }];
+    let forecast = mappingProvider.map((element) => {
+        return {
+            "tempDay": getTempDay(element.dayIndex),
+            "tempNight": getTempNight(element.dayIndex),
+            "humidity": getTransformHumidity(getHumidityDay(element.dayIndex)),
+            "humidityDay": "",
+            "humidityNight": ""
+        }
+    })
     weatherComData[city] = {
         loadTime: loadTime,
         forecast: forecast
     };
-    if ((typeof oldWeatherComData) !== "object") {
+    if ((typeof oldData) !== "object") {
         fs.writeFileSync(path, JSON.stringify(weatherComData));
         return weatherComData[city]["forecast"]
     }
-    oldWeatherComData[city] = weatherComData[city];
-    fs.writeFileSync(path, JSON.stringify(oldWeatherComData));
+    oldData[city] = weatherComData[city];
+    fs.writeFileSync(path, JSON.stringify(oldData));
     return weatherComData[city]["forecast"];
 }
 
 module.exports = {
-    getForecastWeather: getWeatherComDataWeatherForThreeDay
+    getForecastWeather: getForecastWeather
 };

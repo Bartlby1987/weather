@@ -1,33 +1,35 @@
+const weather = {
+    "ясно": "Ясно",
+    "дождь": "Дождь",
+    "снег": "Снег"
+}
 function getTransformHumidity(humidityData) {
     humidityData = humidityData.split(" ");
+    let pathDataAboutWeather;
     for (let i = 0; i < humidityData.length; i++) {
-        let pathDataAboutWeather = humidityData[i].toLowerCase();
-        switch (pathDataAboutWeather) {
-            case "ясно":
-                return "Ясно";
-            case "дождь" :
-                return "Дождь";
-            case "снег" :
-                return "Снег";
+        let oneHumidityData = humidityData[i];
+        pathDataAboutWeather = oneHumidityData.toLowerCase();
+        if (weather.pathDataAboutWeather) {
+            return weather.pathDataAboutWeather
         }
     }
     return "Осадки"
 }
 
 function calculateAverageValue(str) {
-    str = str.trim().split((" "));
-    if (str.length > 1) {
-        if (str[0] === str[1]) {
-            return str[0];
+    let separateStrOnArray = str.trim().split((" "));
+    if (separateStrOnArray.length > 1) {
+        if (separateStrOnArray[0] === separateStrOnArray[1]) {
+            return separateStrOnArray[0];
         } else {
             return "Осадки"
         }
     } else {
-        return str[0]
+        return separateStrOnArray[0]
     }
 }
 
-function getForecastDate(amountOfDays = 3) {
+function generateNextDates(amountOfDays = 3) {
     let dateArray = [];
     let options = {
         month: 'short',
@@ -43,13 +45,14 @@ function getForecastDate(amountOfDays = 3) {
 }
 
 function calculateAverageWeatherData(oneDayData, date) {
-    if (oneDayData.length === 1 && (oneDayData[0]["humidity"])) {
+    let oneDay = oneDayData[0];
+    if (oneDayData.length === 1 && (oneDay["humidity"])) {
         return {
             "date": date,
-            "tempDay": oneDayData[0]["tempDay"],
-            "tempNight": oneDayData[0]["tempNight"],
-            "humidityDay": oneDayData[0]["humidity"],
-            "humidityNight": oneDayData[0]["humidity"],
+            "tempDay": oneDay["tempDay"],
+            "tempNight": oneDay["tempNight"],
+            "humidityDay": oneDay["humidity"],
+            "humidityNight": oneDay["humidity"],
         }
     } else {
         let tempDay = null;
@@ -57,10 +60,11 @@ function calculateAverageWeatherData(oneDayData, date) {
         let humidityDay = null;
         let humidityNight = null;
         for (let i = 0; i < oneDayData.length; i++) {
-            tempDay = tempDay + oneDayData[i]["tempDay"];
-            tempNight = tempNight + oneDayData[i]["tempNight"];
-            humidityDay = humidityDay + " " + oneDayData[i]["humidityDay"];
-            humidityNight = humidityNight + " " + oneDayData[i]["humidityNight"];
+            let oneDayInformation = oneDayData[i];
+            tempDay = tempDay + oneDayInformation["tempDay"];
+            tempNight = tempNight + oneDayInformation["tempNight"];
+            humidityDay = humidityDay + " " + oneDayInformation["humidityDay"];
+            humidityNight = humidityNight + " " + oneDayInformation["humidityNight"];
         }
         return {
             "date": date,
@@ -75,6 +79,7 @@ function calculateAverageWeatherData(oneDayData, date) {
 
 module.exports = {
     getTransformHumidity: getTransformHumidity,
-    getForecastDate: getForecastDate,
+    getForecastDate: generateNextDates,
     calculateAverageWeatherData: calculateAverageWeatherData
 };
+

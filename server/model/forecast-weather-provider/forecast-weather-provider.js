@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const commonUtilities = require("../common-utilities");
+const commonUtils = require("../common-utilities");
 const forecastWeatherUtils = require("./forecast-weather-utilities")
 const weathercomForecastProvider = require('./weathercom/forecast-weathercom-weather-provider');
 const yandexForecastProvider = require('./yandex/forecast-yandex-weather-provider');
@@ -20,7 +20,7 @@ function getForecastWeatherData(cityAndSource) {
             try {
                 requestedSourcesForecast.push(mappingForecastProvider[key].getForecastWeather(city));
             } catch (e) {
-                commonUtilities.logDataLoadingError(key.slice(0, -4), e);
+                commonUtils.logDataLoadingError(key.slice(0, -4), e);
             }
         }
     }
@@ -28,10 +28,11 @@ function getForecastWeatherData(cityAndSource) {
         return []
     }
     let requestedSourcesForecastForDays = _.zip(...requestedSourcesForecast);
-    let first = forecastWeatherUtils.calculateAverageWeatherData(requestedSourcesForecastForDays[0], date[0]);
-    let second = forecastWeatherUtils.calculateAverageWeatherData(requestedSourcesForecastForDays[1], date[1]);
-    let third = forecastWeatherUtils.calculateAverageWeatherData(requestedSourcesForecastForDays[2], date[2]);
-    return [first, second, third]
+    let forecastData = [];
+    for (let i = 0; i < 3; i++) {
+        forecastData.push(forecastWeatherUtils.calculateAverageWeatherData(requestedSourcesForecastForDays[i], date[i]))
+    }
+    return forecastData
 }
 
 module.exports = {
