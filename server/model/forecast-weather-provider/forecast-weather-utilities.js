@@ -9,8 +9,8 @@ function getTransformHumidity(humidityData) {
     for (let i = 0; i < humidityData.length; i++) {
         let oneHumidityData = humidityData[i];
         pathDataAboutWeather = oneHumidityData.toLowerCase();
-        if (weather.pathDataAboutWeather) {
-            return weather.pathDataAboutWeather
+        if (weather[pathDataAboutWeather]) {
+            return weather[pathDataAboutWeather]
         }
     }
     return "Осадки"
@@ -60,11 +60,11 @@ function calculateAverageWeatherData(oneDayData, date) {
         let humidityDay = null;
         let humidityNight = null;
         for (let i = 0; i < oneDayData.length; i++) {
-            let oneDayInformation = oneDayData[i];
-            tempDay = tempDay + oneDayInformation["tempDay"];
-            tempNight = tempNight + oneDayInformation["tempNight"];
-            humidityDay = humidityDay + " " + oneDayInformation["humidityDay"];
-            humidityNight = humidityNight + " " + oneDayInformation["humidityNight"];
+            let firstDay = oneDayData[i];
+            tempDay = tempDay + firstDay["tempDay"];
+            tempNight = tempNight + firstDay["tempNight"];
+            humidityDay = humidityDay + " " + firstDay["humidityDay"];
+            humidityNight = humidityNight + " " + firstDay["humidityNight"];
         }
         return {
             "date": date,
@@ -79,7 +79,7 @@ function calculateAverageWeatherData(oneDayData, date) {
 
 module.exports = {
     getTransformHumidity: getTransformHumidity,
-    getForecastDate: generateNextDates,
+    generateNextDates: generateNextDates,
     calculateAverageWeatherData: calculateAverageWeatherData
 };
 

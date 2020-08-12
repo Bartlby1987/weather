@@ -1,8 +1,8 @@
 const request = require('sync-request');
 const cheerio = require('cheerio');
 const forecastWeatherUtil = require("../forecast-weather-utilities");
-const MAIN_PAGE = `https://yandex.ru/pogoda/search?request=`;
-const DETAIL_PAGE = "https://yandex.ru/pogoda/segment/details?via=srp&cameras=0&geoid=";
+const URL_MAIN_PAGE = `https://yandex.ru/pogoda/search?request=`;
+const URL_DETAIL_PAGE = "https://yandex.ru/pogoda/segment/details?via=srp&cameras=0&geoid=";
 const HREF_ATR_SELECTOR = "body > div > div> div> div > div> div > li:nth-child(1) > a";
 const generateFirstDaySelector = (value) => `body > div > div:nth-child(${value}) > dd > table > tbody > tr:nth-child(2) > 
                                          td.weather-table__body-cell.weather-table__body-cell_type_feels-like > div`
@@ -20,14 +20,14 @@ const FIRST_STRING_ELEMENT = 0;
 const mappingProvider = [{"dayValue": FIRST_DAY_VALUE}, {"dayValue": SECOND_DAY_VALUE}, {"dayValue": THIRD_DAY_VALUE}];
 
 function getForecastWeather(city) {
-    let mainPage = encodeURI(MAIN_PAGE + city);
-    let res = request('GET', mainPage, {});
+    let urlMainPage = encodeURI(URL_MAIN_PAGE + city);
+    let res = request('GET', urlMainPage, {});
     let htmlDataPage = cheerio.load(res.body);
     let href = htmlDataPage(HREF_ATR_SELECTOR).attr("href");
     let cityNumber = href.replace(/\D/g, '');
-    let detailPage = DETAIL_PAGE + cityNumber;
-    detailPage = encodeURI(detailPage);
-    let rest = request('GET', detailPage, {});
+    let urlDetailPage = URL_DETAIL_PAGE + cityNumber;
+    urlDetailPage = encodeURI(urlDetailPage);
+    let rest = request('GET', urlDetailPage, {});
     let htmlDetailPage = cheerio.load(rest.body);
 
     function getTempDay(dayValue) {

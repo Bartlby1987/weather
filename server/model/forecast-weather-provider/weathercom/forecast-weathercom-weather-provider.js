@@ -2,10 +2,10 @@ const request = require('sync-request');
 const cheerio = require('cheerio');
 const fs = require("fs");
 let path = __dirname + "/weathercom-forecast-cache.json";
-const API_REQUEST = (value) => `https://api.openweathermap.org/data/2.5/weather?q=${value},&APPID=
-                            0b58b5094eddd4fdfa4a1fe10ca5034e`
-const API_REQUEST_FOR_COORDINATES = (lat, lon) => `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}
-                                   &units=metric&exclude=hourly,current,minutely&appid=0b58b5094eddd4fdfa4a1fe10ca5034e`
+const API_REQUEST = (value) => `https://api.openweathermap.org/data/2.5/weather?q=${value}` +
+    `,&APPID=0b58b5094eddd4fdfa4a1fe10ca5034e`
+const API_REQUEST_FOR_COORDINATES = (lat, lon) => `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}` +
+    `&units=metric&exclude=hourly,current,minutely&appid=0b58b5094eddd4fdfa4a1fe10ca5034e`
 const CACHE_LIFETIME_LIMIT_IN_MILLISECONDS = 60 * 60 * 1000;
 const FIRST_DAY_VALUE = 1;
 const SECOND_DAY_VALUE = 2;
@@ -23,8 +23,8 @@ function getTransformHumidity(humidityData) {
     for (let i = 0; i < humidityData.length; i++) {
         let humidity = humidityData[i];
         pathDataAboutWeather = humidity.toLowerCase();
-        if (weatherData.pathDataAboutWeather) {
-            return weatherData.pathDataAboutWeather
+        if (weatherData[pathDataAboutWeather]) {
+            return weatherData[pathDataAboutWeather]
         }
     }
     return "Осадки"
@@ -57,19 +57,19 @@ function getForecastWeather(city) {
     let apiRequest = encodeURI(API_REQUEST_FOR_COORDINATES(lat, lon));
     let rest = request('GET', apiRequest, {});
     let jsonDataAPIForWeather = (cheerio.load(rest.getBody()));
-    let jsonDataRequest = jsonDataAPIForWeather.text();
-    let jsonObjRequest = JSON.parse(jsonDataRequest);
+    let jsonDataResponse = jsonDataAPIForWeather.text();
+    let jsonObjResponse = JSON.parse(jsonDataResponse);
 
     function getTempDay(dayValue) {
-        return Math.round(Number(jsonObjRequest["daily"][dayValue]["temp"]["day"]));
+        return Math.round(Number(jsonObjResponse["daily"][dayValue]["temp"]["day"]));
     }
 
     function getTempNight(dayValue) {
-        return Math.round(Number(jsonObjRequest["daily"][dayValue]["temp"]["night"]));
+        return Math.round(Number(jsonObjResponse["daily"][dayValue]["temp"]["night"]));
     }
 
     function getHumidityDay(dayValue) {
-        return jsonObjRequest["daily"][dayValue]["weather"][0]["main"];
+        return jsonObjResponse["daily"][dayValue]["weather"][0]["main"];
     }
 
     let weatherComData = {};
