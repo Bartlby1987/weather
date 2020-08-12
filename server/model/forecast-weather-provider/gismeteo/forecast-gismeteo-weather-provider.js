@@ -1,10 +1,10 @@
 const request = require('sync-request');
 const cheerio = require('cheerio');
 const forecastWeatherUtils = require("../forecast-weather-utilities");
-const URL_SEARCH_PAGE = "https://www.gismeteo.ru/search/";
+const SEARCH_URL_PAGE = "https://www.gismeteo.ru/search/";
 const HREF_SELECTOR = "body > section > div.content_wrap.countries > div > section > div > div > " +
     "div:nth-child(1) > a.catalog_link.link.blue.fontM";
-const generateUrlDataPage = (value) => `https://www.gismeteo.ru${value}3-days/#2-4-days `;
+const generateDataUrlPage = (value) => `https://www.gismeteo.ru${value}3-days/#2-4-days `;
 const generateTempDaySelector = (value) => `body > section > div> div > div> div > div> div> div > div.forecast_scroll > div 
                     > div._line.templine.clearfix > div > div > div:nth-child(${value}) > span.unit.unit_temperature_c`;
 const generateTempNightSelector = (value) => `body > section > div> div > div > div > div> div> div > div> div > 
@@ -34,12 +34,12 @@ const mappingProvider = [
 ]
 
 function getForecastWeather(city) {
-    let urlSearchPageByCity = encodeURI(URL_SEARCH_PAGE + city);
-    let res = request('GET', urlSearchPageByCity, {});
+    let searchUrlPageByCity = encodeURI(SEARCH_URL_PAGE + city);
+    let res = request('GET', searchUrlPageByCity, {});
     let htmlSearchPage = cheerio.load(res.body);
     let href = htmlSearchPage(HREF_SELECTOR).attr("href");
-    let urlDataPage = generateUrlDataPage(href);
-    let rest = request('GET', urlDataPage, {});
+    let dataUrlPage = generateDataUrlPage(href);
+    let rest = request('GET', dataUrlPage, {});
     let htmlPage = cheerio.load(rest.body);
 
     function getTempDay(dayValue) {
