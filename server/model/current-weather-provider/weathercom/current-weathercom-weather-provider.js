@@ -3,10 +3,12 @@ const request = require('sync-request');
 const fs = require("fs");
 const constants = require('../../constant-list');
 let path = __dirname + '/weathercom-current-cache.json';
-const WEATHER_COM_KEY = `,&APPID=0b58b5094eddd4fdfa4a1fe10ca5034e`;
-const WEATHER_API_REQUEST = `https://api.openweathermap.org/data/2.5/weather?q=`;
+const API_REQUEST = (value) => `https://api.openweathermap.org/data/2.5/weather?q=${value}` +
+    `,&APPID=0b58b5094eddd4fdfa4a1fe10ca5034e`;
+const CACHE_LIFETIME_LIMIT_IN_MILLISECONDS = 60 * 60 * 1000;
+const ABSOLUT_ZERO_IN_FAHRENHEIT = 273;
 
-function getCurrentWeathercomData(city) {
+function getWeather(city) {
     let cityData = {};
     let cacheData = fs.readFileSync(path, "utf8");
     if (cacheData === "") {
@@ -15,17 +17,17 @@ function getCurrentWeathercomData(city) {
         cacheData = JSON.parse(cacheData)
     }
     let realTime = new Date().getTime();
-    if (!cacheData[city] || (cacheData[city]["lastUpdated"] - realTime) > 3600000) {
-        let url = encodeURI(`${WEATHER_API_REQUEST}${city}${WEATHER_COM_KEY}`);
-        let res = request('GET', url);
-        if (res.statusCode!==200){
+    if (!cacheData[city] || (cacheData[city]["lastUpdated"] - realTime) > CACHE_LIFETIME_LIMIT_IN_MILLISECONDS) {
+        let apiRequestUrl = encodeURI(API_REQUEST(city));
+        let res = request('GET', apiRequestUrl);
+        if (res.statusCode !== 200) {
             return {temp: constants.NO_DATA, humidity: constants.NO_DATA};
         }
-        let $ = (cheerio.load(res.getBody()));
-        let jsonData = $.text();
+        let jsonDataAPI = (cheerio.load(res.getBody()));
+        let jsonData = jsonDataAPI.text();
         let jsonObj = JSON.parse(jsonData);
         let humidity = jsonObj.main.humidity;
-        let temp = Math.trunc(Number(jsonObj.main.temp) - 273);
+        let temp = Math.trunc(Number(jsonObj.main.temp) - ABSOLUT_ZERO_IN_FAHRENHEIT);
         if (temp > 0) {
             temp = "+" + temp;
         } else if (temp === 0) {
@@ -47,5 +49,5 @@ function getCurrentWeathercomData(city) {
 }
 
 module.exports = {
-    getWeather:  getCurrentWeathercomData
+    getWeather: getWeather
 };
