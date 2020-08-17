@@ -6,7 +6,7 @@ let path = __dirname + '/weathercom-current-cache.json';
 const API_REQUEST = (value) => `https://api.openweathermap.org/data/2.5/weather?q=${value}` +
     `,&APPID=0b58b5094eddd4fdfa4a1fe10ca5034e`;
 const CACHE_LIFETIME_LIMIT_IN_MILLISECONDS = 60 * 60 * 1000;
-const ABSOLUT_ZERO_IN_FAHRENHEIT = 273;
+const ABSOLUT_ZERO_IN_KELVIN = 273;
 
 function getWeather(city) {
     let cityData = {};
@@ -27,7 +27,7 @@ function getWeather(city) {
         let jsonData = jsonDataAPI.text();
         let jsonObj = JSON.parse(jsonData);
         let humidity = jsonObj.main.humidity;
-        let temp = Math.trunc(Number(jsonObj.main.temp) - ABSOLUT_ZERO_IN_FAHRENHEIT);
+        let temp = Math.trunc(Number(jsonObj.main.temp) - ABSOLUT_ZERO_IN_KELVIN);
         if (temp > 0) {
             temp = "+" + temp;
         } else if (temp === 0) {
