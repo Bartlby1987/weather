@@ -2,10 +2,10 @@ const fs = require("fs");
 let forecastWeatherProvider = require('../model/forecast-weather-provider/forecast-weather-provider');
 let path = require("path");
 let cacheFilePath = path.resolve("./cache/forecast-cache.json");
+const CACHE_LIFETIME_LIMIT_IN_MILLISECONDS = 60 * 60 * 1000;
 
 function getForecast(requestData) {
     let cacheFileString = fs.readFileSync(cacheFilePath, "utf8");
-    // console.log("\n Данные полученные из кэша :\n\n" + cacheFileString+"\n\n");
     let weatherData = [];
     let forecastData = {};
     if (cacheFileString === "") {
@@ -15,7 +15,6 @@ function getForecast(requestData) {
         let forecastWeather = forecastWeatherProvider.getForecastWeatherData(requestData);
         forecastData["forecastWeather"] = forecastWeather;
         weatherData.push(forecastData);
-        // console.log("Запивываем данные в случае отсутствия данных в кэше  :\n\n" + JSON.stringify(weatherData)+"\n\n");
         fs.writeFileSync(cacheFilePath, JSON.stringify(weatherData));
         return forecastWeather;
     }
@@ -29,21 +28,16 @@ function getForecast(requestData) {
         let isNewAndOldYandexSourceAreEqual = oneCityOldData["yandexFlag"] === requestData["citiesSource"]["yandexFlag"];
         let isNewAndOldGismeteoSourceAreEqual = oneCityOldData["gismeteoFlag"] === requestData["citiesSource"]["gismeteoFlag"];
         let isNewAndOldWeatherSourceAreEqual = oneCityOldData["weatherFlag"] === requestData["citiesSource"]["weatherFlag"];
-        const oneHourInMilliseconds = 3600000;
-        let isRequestTimeMoreThanOneOur = (nowRequestTime - weatherWriteTimeRequest) < oneHourInMilliseconds;
+        let isRequestTimeMoreThanOneOur = (nowRequestTime - weatherWriteTimeRequest) < CACHE_LIFETIME_LIMIT_IN_MILLISECONDS;
         if (isNewAndOldCitiesAreEqual && isNewAndOldYandexSourceAreEqual && isNewAndOldGismeteoSourceAreEqual && isNewAndOldWeatherSourceAreEqual &&
             isRequestTimeMoreThanOneOur) {
-            // console.log("Данные которые беруться из кеша в случае совпадения города и источников :\n\n"+
-            //     JSON.stringify(oldWeatherData[i])+"\n\n");
             return oldOneCityForecast;
         }
         if (isNewAndOldCitiesAreEqual) {
             let threeDaysWeatherData = forecastWeatherProvider.getForecastWeatherData(requestData);
-            // console.log("\n\nДанные полученные за 3 дня :\n\n"+JSON.stringify(threeDaysWeatherData));
-            weatherWriteTimeRequest = new Date().getTime();
-            oldOneCityForecast = threeDaysWeatherData;
+            oneCityOldData["requestTime"] = new Date().getTime();
+            oneCityOldData["forecast"] = threeDaysWeatherData;
             oneCityOldData["sources"] = requestData["citiesSource"];
-            // console.log("Записываем данные в кэшь если город собподает, но источники нет :\n\n" + JSON.stringify(oldWeatherData)+"\n\n");
             fs.writeFileSync(cacheFilePath, JSON.stringify(oldWeatherData));
             return threeDaysWeatherData
         }
@@ -57,12 +51,10 @@ function getForecast(requestData) {
         "forecast": forecast
     };
     oldWeatherData.push(newCityForecast);
-    // console.log("Данные если за три дня по городу данных нет\n\n"+JSON.stringify(oldWeatherData)+"\n\n");
     fs.writeFileSync(cacheFilePath, JSON.stringify(oldWeatherData));
     return forecast
 }
 
-// console.log(getForecast({citiesSource: {yandexFlag: true, gismeteoFlag: true, weatherFlag: true}, city: "Рим"}));
 module.exports = {
     getForecast: getForecast
 };
