@@ -2,7 +2,7 @@ const weathercomProvider = require('./weathercom/current-weathercom-weather-prov
 const yandexProvider = require('./yandex/current-yandex-weather-provider.js');
 const gismeteoProvider = require('./gismeteo/current-gismeteo-weather-provider.js');
 const cityNameResolve = require("./full-city-name-resolve");
-const commonUtilities = require("../common-utilities");
+const commonUtils = require("../common-utilities");
 const constants = require('../constant-list');
 
 const mappingProvider = {
@@ -22,7 +22,7 @@ function createCityWeatherData(addCity, sources) {
         try {
             cityData[source] = provider.getWeather(addCity)
         } catch (e) {
-            commonUtilities.logDataLoadingError(source, e);
+            commonUtils.logDataLoadingError(source, e);
             cityData[source] = {temp: constants.NO_DATA, humidity: constants.NO_DATA}
         }
     }
