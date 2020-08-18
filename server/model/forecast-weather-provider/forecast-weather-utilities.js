@@ -55,10 +55,10 @@ function calculateAverageWeatherData(oneDayData, date) {
             "humidityNight": oneDay["humidity"],
         }
     } else {
-        let tempDay = null;
-        let tempNight = null;
-        let humidityDay = null;
-        let humidityNight = null;
+        let tempDay = 0;
+        let tempNight = 0;
+        let humidityDay = "";
+        let humidityNight = "";
         for (let i = 0; i < oneDayData.length; i++) {
             let firstDay = oneDayData[i];
             tempDay = tempDay + firstDay["tempDay"];
