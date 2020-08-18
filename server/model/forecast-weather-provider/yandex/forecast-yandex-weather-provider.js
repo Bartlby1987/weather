@@ -18,18 +18,17 @@ const generateHumidityDaySelector = (value) => `body > div.b-page__container > d
 const generateHumidityNightSelector = (value) => `body > div.b-page__container > div.content > div.forecast-details-segment` +
     `> div > div > div:nth-child(${value}) > dd > table > tbody > tr:nth-child(4) >` +
     `td.weather-table__body-cell.weather-table__body-cell_type_condition`
-
 const FIRST_DAY_VALUE = 3;
 const SECOND_DAY_VALUE = 4;
 const THIRD_DAY_VALUE = 5;
+const INDEX_FOR_REPLACE = "/pogoda/?";
 const mappingProvider = [{"dayValue": FIRST_DAY_VALUE}, {"dayValue": SECOND_DAY_VALUE}, {"dayValue": THIRD_DAY_VALUE}];
-
 function getForecastWeather(city) {
     let mainPageUrl = encodeURI(MAIN_PAGE_URL + city);
     let res = request('GET', mainPageUrl, {});
     let htmlDataPage = cheerio.load(res.body);
     let href = htmlDataPage(HREF_ATR_SELECTOR).attr("href");
-    href = href.split("?")[1];
+    href = href.replace(INDEX_FOR_REPLACE, "");
     let detailPageUrl = DETAIL_PAGE_URL + href;
     detailPageUrl = encodeURI(detailPageUrl);
     let rest = request('GET', detailPageUrl, {});
