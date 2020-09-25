@@ -8,7 +8,7 @@
     "@testing-library/user-event": "^7.2.1",
     "babel": "^6.23.0",
     "body-parser": "^1.19.0",
-    "bootstrap": "^4.4.1",
+    "bootstrap": "^4.5.2",
     "cheerio": "^1.0.0-rc.3",
     "express": "^4.17.1",
     "express-validator": "^6.4.0",
@@ -43,5 +43,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "history": "^4.10.1",
+    "react-router-dom": "^5.2.0"
   }
 }

@@ -29,7 +29,7 @@ class NavBar extends React.Component {
         return (
             <nav className="navbar navbar-light bg-light">
                 <form className="form-inline">
-                    <Link to="/">
+                    <Link to="/addCity">
                         <div>
                             <button className="btn btn-outline-success" type="button"
                                     onClick={this.onClickShowCityData}> Главная страница
