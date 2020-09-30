@@ -10,8 +10,7 @@ class RegistrationPanel extends React.Component {
             name: '',
             email: '',
             login: '',
-            password: '',
-            profileInfo: ''
+            password: ''
         }
 
         this.handleInputChange = this.handleInputChange.bind(this)
@@ -67,12 +66,6 @@ class RegistrationPanel extends React.Component {
                             <label htmlFor="password">Password:</label>
                             <input type="password" id="password" name="password" value={this.state.password}
                                    onChange={this.handleInputChange}/>
-                        </fieldset>
-                        <fieldset>
-                            <legend><span className="number">2</span>Your profile</legend>
-                            <label htmlFor="profileInfo">Biography:</label>
-                            <textarea id="profileInfo" name="profileInfo" value={this.state.profileInfo}
-                                      onChange={this.handleInputChange}/>
                         </fieldset>
                         <button onClick={this.onClickRegistration.bind(this)} type="submit" className="button"
                                 disabled={disableButton}> Sign Up
