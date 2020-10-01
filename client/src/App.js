@@ -20,30 +20,29 @@ class App extends React.Component {
         }
     };
 
-    // async componentDidMount() {
-    //     try {
-    //         let promise = await this.sendRequest(null, 'main/checkSession', 'GET');
-    //         if ("name" in promise && "email" in promise && "login" in promise) {
-    //             this.setState({personAuthorizationInfo: promise}, () => {
-    //                 history.push('/userPanel')
-    //             })
-    //         } else {
-    //             history.push('/')
-    //         }
-    //     } catch (err) {
-    //         history.push('/')
-    //     }
-    // }
-    //
+    async componentDidMount() {
+        try {
+            let promise = await this.sendRequest(null, '/weather/checkSession', 'GET');
+            if ("name" in promise && "email" in promise && "login" in promise) {
+                this.setState({personAuthorizationInfo: promise}, () => {
+                    history.push('/userPanel/main')
+                })
+            } else {
+                history.push('/')
+            }
+        } catch (err) {
+            history.push('/')
+        }
+    }
+
     closeRegistrationPopup() {
         this.setState({"statusRegistration": ""});
         history.push('/');
     }
 
-    //
-    // closeAuthorizationPopup() {
-    //     this.setState({"errorAuthorization": ""})
-    // }
+    closeAuthorizationPopup() {
+        this.setState({"errorAuthorization": ""})
+    }
 
     // sendPostRequest = async (userInfo, url,method) => {
     //     let response = await fetch(url, {
@@ -81,16 +80,17 @@ class App extends React.Component {
         this.setState({"statusRegistration": responseStatus})
     }
 
-
-    // async sendingUserAuthorizationInformation(LoginPassword) {
-    //     const url = "main/authorization";
-    //     let response = await this.sendPostRequest(LoginPassword, url)
-    //     if ("name" in response && "email" in response && "login" in response) {
-    //         this.setState({"personAuthorizationInfo": response}, () => history.push('/personInfo'))
-    //         return
-    //     }
-    //     this.setState({"errorAuthorization": response})
-    // }
+    async sendingUserAuthorizationInformation(LoginPassword) {
+        const url = "weather/authorization";
+        const method = "POST";
+        let response = await this.sendRequest(LoginPassword, url, method)
+        console.log(response);
+        if ((typeof response) !== "string") {
+            this.setState({"personAuthorizationInfo": response}, () => history.push('/userPanel/main'))
+            return
+        }
+        this.setState({"errorAuthorization": response})
+    }
 
     // async getPersonInformation() {
     //     const url = "main/personInfo";
@@ -102,18 +102,32 @@ class App extends React.Component {
     //     this.setState({"errorAuthorization": response})
     // }
 
-    // async logOutFromSession() {
-    //     const url = "main/logOut";
-    //     await this.sendPostRequest({}, url)
-    //     this.setState({"personAuthorizationInfo": ""})
-    // }
+    async logOutFromSession() {
+        const url = "/weather/logOut";
+        await this.sendRequest(null, url, "POST")
+        this.setState({"personAuthorizationInfo": ""})
+        history.push('/');
+    }
 
     render() {
+        let information;
+        if (this.state.errorAuthorization !== "") {
+            information = <div>
+                <Popup text={this.state.errorAuthorization}
+                       closePopup={this.closeAuthorizationPopup.bind(this)}/>
+            </div>
+        } else if (this.state.personAuthorizationInfo !== "") {
+            information = <Route path='/userPanel/'
+                                 render={() => <UserPanel logOutFromSession={this.logOutFromSession.bind(this)}/>}/>
+        } else {
+            information = <Route exact path='/' render={() => <AuthorizationPanel
+                authorizationUser={this.sendingUserAuthorizationInformation.bind(this)}/>}/>
+        }
+
         return (
             <Router history={history}>
                 <div>
-                    <Route exact path='/' render={() => <AuthorizationPanel/>}/>
-
+                    {information}
                     {this.state.statusRegistration === "" ?
                         <Route path='/registration' render={() => <RegistrationPanel sendingUserRegistrationInformation=
                                                                                          {this.sendingUserRegistrationInformation.bind(this)}/>}/> :
@@ -124,5 +138,4 @@ class App extends React.Component {
         );
     }
 }
-
 export default App;

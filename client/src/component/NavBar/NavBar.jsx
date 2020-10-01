@@ -1,6 +1,7 @@
 import React from 'react';
 import {Link} from 'react-router-dom'
 import './NavBar.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 class NavBar extends React.Component {
     constructor(props) {
@@ -9,6 +10,10 @@ class NavBar extends React.Component {
             "spinner": false,
             source: this.props.source
         };
+    }
+
+    onClickLogOutFromSession = () => {
+        this.props.logOutFromSession();
     }
 
     onClickShowCityData = () => {
@@ -29,18 +34,27 @@ class NavBar extends React.Component {
         return (
             <nav className="navbar navbar-light bg-light">
                 <form className="form-inline">
-                    <Link to="/addCity">
+                    <Link to="/userPanel/main">
                         <div>
                             <button className="btn btn-outline-success" type="button"
                                     onClick={this.onClickShowCityData}> Главная страница
                             </button>
                         </div>
                     </Link>
-                    <Link to="/Properties">
+                    <Link to="/userPanel/Properties">
                         <div className="padding_button">
                             <button className="btn btn-outline-success" type="button">Настройки</button>
                         </div>
                     </Link>
+
+
+                    <div className="padding_button">
+                        <button onClick={this.onClickLogOutFromSession} className="btn btn-outline-success"
+                                type="button">Выход
+                        </button>
+                    </div>
+
+
                 </form>
             </nav>
         );

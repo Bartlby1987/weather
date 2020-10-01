@@ -23,7 +23,7 @@ class AuthorizationPanel extends React.Component {
     }
 
     onClickUserSingUp() {
-        this.props.getUserInformation(this.state)
+        this.props.authorizationUser(this.state)
     }
 
     render() {

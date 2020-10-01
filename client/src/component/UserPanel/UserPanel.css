@@ -1,21 +1,21 @@
-.all_information_zoom {
+.all_info_zoom {
     zoom: 1;
 }
 
 @media screen and (max-width: 992px) {
-    .all_information_zoom {
+    .all_info_zoom {
         zoom: 0.9;
     }
 }
 
 @media screen and (max-width: 599px) {
-    .all_information_zoom {
+    .all_info_zoom {
         zoom: 0.7;
     }
 }
 
 @media screen and (max-width: 72px) {
-    .all_information_zoom {
+    .all_info_zoom {
         zoom: 0.5;
     }
 }

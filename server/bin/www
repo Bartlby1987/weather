@@ -9,6 +9,7 @@ var debug = require('debug')('api:server');
 var http = require('http');
 
 let cacheCleaner = require("../cache/cache-cleaner.js");
+let userDatabase = require("../model/create-database-table/create-database-table");
 
 /**
  * Get port from environment and store in Express.
@@ -90,4 +91,5 @@ function onListening() {
         : 'port ' + addr.port;
     debug('Listening on ' + bind);
     cacheCleaner.clearAllCacheFile();
+    userDatabase.createTables();
 }

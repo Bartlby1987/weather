@@ -356,10 +356,11 @@ class UserPanel extends React.Component {
                 />
             </div>;
         } else {
-            information = <div className="all_information_zoom">
+            information = <div className="all_info_zoom">
                 <NavBar onClickRefresheData={this.onClickRefreshData.bind(this)} source={this.state.source}
-                        changeSpinnerStatus={this.changeSpinnerStatus.bind(this)}/>
-                <Route exact path="/addCity" render={() =>
+                        changeSpinnerStatus={this.changeSpinnerStatus.bind(this)}
+                        logOutFromSession={this.props.logOutFromSession}/>
+                <Route exact path="/userPanel/main" render={() =>
                     <ShowCitesAndWeather
                         changeThreeDayWeatherStatus={this.changeThreeDayWeatherStatus.bind(this)}
                         spinnerOnThreeDays={this.state.spinnerOnThreeDays}
@@ -373,7 +374,7 @@ class UserPanel extends React.Component {
                         onClickShowWeatherOnThreeDays={(city) => this.onClickShowWeatherOnThreeDays(city)}
                     />}
                 />
-                <Route exact path="/properties" render={() => <Properties
+                <Route exact path="/userPanel/properties" render={() => <Properties
                     onOrOffSourceYandex={this.state.source.yandexFlag}
                     onOrOffSourceGismeteo={this.state.source.gismeteoFlag}
                     onOrOffSourceWeather={this.state.source.weatherFlag}
