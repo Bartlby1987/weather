@@ -162,8 +162,11 @@ class UserPanel extends React.Component {
     }
 
 //todo the logic in this function should be split
+
     onClickAddCity(city, callback) {
-        const url = "weather/current";
+
+
+        const url = "/weather/current";
         let citiesData;
         if ((typeof city) === "string") {
             citiesData = this.createUpdatedCitiesList(city);
@@ -207,7 +210,7 @@ class UserPanel extends React.Component {
                 return currentWeatherData
             }
         };
-        return sendPostIPARequest(JSON.stringify(citiesData));
+        return sendPostIPARequest((citiesData));
     }
 
     async onClickRefreshData(callback) {
@@ -247,7 +250,7 @@ class UserPanel extends React.Component {
     }
 
     async getWeatherOnThreeDays(city) {
-        const url = "weather/forecast";
+        const url = "/weather/forecast";
         let cloneSource = JSON.parse(JSON.stringify(this.state.source));
         let newSource = {
             yandexFlag: cloneSource.yandexFlag,

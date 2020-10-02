@@ -1,17 +1,15 @@
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('db.sqlite3');
+const fs = require("fs");
+const sqlCreateTableRequest = "./model/create-database-table/create-tables-sql.sql";
 
-function createTables() {
-    let createTableSql = "CREATE TABLE IF NOT EXISTS users (name TEXT NOT NULL,email TEXT NOT NULL UNIQUE," +
-        "login TEXT NOT NULL UNIQUE ,password TEXT NOT NULL)";
-    sqlRequest(createTableSql)
-    let createSessionTableSql = "CREATE TABLE IF NOT EXISTS usersSession (sessionId TEXT NOT NULL ," +
-        "name TEXT NOT NULL,email TEXT NOT NULL UNIQUE, login TEXT NOT NULL UNIQUE)";
-    sqlRequest(createSessionTableSql)
+async function createTables() {
+    const requestTableListSql = fs.readFileSync(sqlCreateTableRequest, "utf8");
+    await sqlRequest(requestTableListSql);
 }
 
 function sqlRequest(sql) {
-    db.all(sql, [], (err) => {
+    db.exec(sql, (err) => {
         if (err) {
             throw err;
         }

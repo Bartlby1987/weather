@@ -7,9 +7,7 @@ import Popup from "./component/ShowCitesAndWeather/ShowCityAndWeather/PopUp/PopU
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import {createBrowserHistory} from "history";
-
 const history = createBrowserHistory();
-
 class App extends React.Component {
     constructor(props) {
         super(props);
@@ -23,7 +21,7 @@ class App extends React.Component {
     async componentDidMount() {
         try {
             let promise = await this.sendRequest(null, '/weather/checkSession', 'GET');
-            if ("name" in promise && "email" in promise && "login" in promise) {
+            if ("USER_NAME" in promise && "USER_EMAIL" in promise && "USER_LOGIN" in promise) {
                 this.setState({personAuthorizationInfo: promise}, () => {
                     history.push('/userPanel/main')
                 })
@@ -44,20 +42,6 @@ class App extends React.Component {
         this.setState({"errorAuthorization": ""})
     }
 
-    // sendPostRequest = async (userInfo, url,method) => {
-    //     let response = await fetch(url, {
-    //         method: method,
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //         },
-    //         body: (JSON.stringify(userInfo))
-    //     });
-    //     if (!response.ok) {
-    //         this.setState({error: !this.state.error, errorResponse: response});
-    //         return
-    //     }
-    //     return await response.json();
-    // };
     sendRequest = async (data, url, method) => {
         let obj = {
             method: method,
@@ -91,17 +75,6 @@ class App extends React.Component {
         }
         this.setState({"errorAuthorization": response})
     }
-
-    // async getPersonInformation() {
-    //     const url = "main/personInfo";
-    //     let response = await this.sendPostRequest({}, url)
-    //     if ("name" in response && "email" in response && "login" in response) {
-    //         this.setState({"personAuthorizationInfo": response})
-    //         return
-    //     }
-    //     this.setState({"errorAuthorization": response})
-    // }
-
     async logOutFromSession() {
         const url = "/weather/logOut";
         await this.sendRequest(null, url, "POST")

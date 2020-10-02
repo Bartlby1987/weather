@@ -10,7 +10,7 @@ router.use(bodyParser.json());
 
 router.get('/checkSession', async function (req, res) {
     try {
-        let token = req.cookies.SESSION_ID;
+        let token = req.cookies.ID;
         if (!token) {
             res.send()
         }
@@ -33,9 +33,9 @@ router.post('/registration', async function (req, res) {
 
 router.post('/logOut', async function (req, res) {
     try {
-        let token = req.cookies.SESSION_ID;
+        let token = req.cookies.ID;
         req.session = null
-        res.clearCookie('SESSION_ID', {path: '/'})
+        res.clearCookie('ID', {path: '/'})
         res.status(200).json('User Logged out')
         await authorization.logOutFromSession(token);
         res.json()
@@ -49,7 +49,7 @@ router.post('/authorization', async function (req, res) {
     let loginPassword = req.body;
     try {
         let authorizationInfo = await authorization.authorizeUser(loginPassword);
-        res.setHeader(`Set-Cookie`, `SESSION_ID=${authorizationInfo["sessionId"]}; HttpOnly; Path=/`)
+        res.setHeader(`Set-Cookie`, `ID=${authorizationInfo["id"]}; HttpOnly; Path=/`)
         res.json(authorizationInfo);
     } catch (err) {
         res.json(err)

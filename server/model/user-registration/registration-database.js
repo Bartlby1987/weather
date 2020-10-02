@@ -10,14 +10,14 @@ let hashPassword = (password) => {
 
 async function addUserRegistrationInformation(registrationData) {
     return new Promise(async (resolve, reject) => {
-        let sql = `SELECT login, email FROM users WHERE login='${registrationData["login"]}' OR ` +
-            `email='${registrationData["email"]}'`;
+        let sql = `SELECT LOGIN, EMAIL FROM users WHERE LOGIN='${registrationData["login"]}' OR ` +
+            `EMAIL='${registrationData["email"]}'`;
         try {
             let existedUser = await commonUtils.execAsync(sql);
             if (!existedUser || existedUser.length === 0) {
-                let params = [registrationData["name"], registrationData["email"],
+                let params = [null, registrationData["name"], registrationData["email"],
                     registrationData["login"], hashPassword(registrationData["password"])];
-                await commonUtils.execAsync("INSERT INTO users VALUES (?,?,?,?)", params);
+                await commonUtils.execAsync("INSERT INTO users VALUES (?,?,?,?,?)", params);
                 resolve(statusResponse.successful)
             } else {
                 reject(statusResponse.loginUsed)
