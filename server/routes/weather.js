@@ -5,6 +5,11 @@ let currentWeatherProvider = require('../model/current-weather-provider/current-
 let forecastCache = require('../cache/forecast-cache.js');
 const dataBase = require("../model/user-registration/registration-database");
 const authorization = require("../model/user-authorization/authorization");
+const {changeForecastStatus} = require("../model/change-forecast-status/change-forecast-status");
+const {saveProperties} = require("../model/save-properties/save-sources");
+const {deleteCity} = require("../model/delete-city/delete-city");
+const {addCity} = require("../model/add-city/add-city");
+
 router.use(bodyParser.urlencoded({extended: false}));
 router.use(bodyParser.json());
 
@@ -31,6 +36,17 @@ router.post('/registration', async function (req, res) {
     }
 });
 
+router.post('/saveProperties', async function (req, res) {
+    let source = req.body;
+    let token = req.cookies.ID;
+    try {
+        let msg = await saveProperties(source, token);
+        res.json(msg)
+    } catch (error) {
+        res.json(error)
+    }
+});
+
 router.post('/logOut', async function (req, res) {
     try {
         let token = req.cookies.ID;
@@ -44,7 +60,6 @@ router.post('/logOut', async function (req, res) {
     }
 });
 
-
 router.post('/authorization', async function (req, res) {
     let loginPassword = req.body;
     try {
@@ -56,16 +71,56 @@ router.post('/authorization', async function (req, res) {
     }
 });
 
-router.post('/current', function (req, res) {
-    let cities = req.body;
-    let weatherCityData = currentWeatherProvider.getCurrentWeather(cities);
-    res.send(JSON.stringify(weatherCityData));
+router.post('/current', async function (req, res) {
+    try {
+        let token = req.cookies.ID;
+        let weatherCityData = await currentWeatherProvider.getCurrentWeather(token);
+        res.json(weatherCityData);
+    } catch (err) {
+        res.json(err)
+    }
+});
+router.post('/changeForecast', async function (req, res) {
+    try {
+        let token = req.cookies.ID;
+        let cities = req.body;
+        let weatherCityData = await changeForecastStatus(cities, token);
+        res.json(weatherCityData);
+    } catch (err) {
+        res.json(err)
+    }
+});
+
+router.post('/addCity', async function (req, res) {
+    let token = req.cookies.ID;
+    try {
+        let cities = req.body;
+        let weatherCityData = await addCity(cities, token);
+        res.json(weatherCityData);
+    } catch (err) {
+        res.json(err)
+    }
+});
+
+router.post('/deleteCity', async function (req, res) {
+    let token = req.cookies.ID;
+    try {
+        let cities = (req.body)["city"];
+        let weatherCityData = await deleteCity(cities, token);
+        res.json(weatherCityData);
+    } catch (err) {
+        res.json(err)
+    }
 });
 
 router.post('/forecast', function (req, res) {
-    let citiesAndSource = req.body;
-    let weatherCityDataOnThreeDay = forecastCache.getForecast(citiesAndSource);
-    res.send(JSON.stringify(weatherCityDataOnThreeDay));
+    try {
+        let citiesAndSource = req.body;
+        let weatherCityDataOnThreeDay = forecastCache.getForecast(citiesAndSource);
+        res.json(weatherCityDataOnThreeDay);
+    } catch (err) {
+        res.json(err)
+    }
 });
 
 

@@ -6,19 +6,18 @@ const statusResponse = {
     internalError: "Internal Server Error."
 }
 const commonUtils = require("../common-utilities");
-
 async function authorizeUser(loginPassword) {
     return new Promise(async (resolve, reject) => {
             try {
                 let login = loginPassword["login"];
-                let sessionExistSql = `SELECT USER_LOGIN FROM usersSession WHERE USER_LOGIN='${login}'`;
+                let sessionExistSql = `SELECT USER_LOGIN FROM USERS_SESSION WHERE USER_LOGIN='${login}'`;
                 let existSession = await commonUtils.execAsync(sessionExistSql);
                 if (existSession || existSession.length !== 0) {
-                    let sqlDeleteSession = `DELETE FROM  usersSession  WHERE USER_LOGIN='${login}'`;
+                    let sqlDeleteSession = `DELETE FROM  USERS_SESSION  WHERE USER_LOGIN='${login}'`;
                     await commonUtils.execAsync(sqlDeleteSession);
                 }
                 let hashPassword = crypto.createHash('md5').update(loginPassword["password"]).digest('hex');
-                let sqlExistedUser = `SELECT * FROM users WHERE LOGIN='${loginPassword["login"]}' AND ` +
+                let sqlExistedUser = `SELECT * FROM USERS WHERE LOGIN='${loginPassword["login"]}' AND ` +
                     `PASSWORD='${hashPassword}'`;
                 let existedUser = await commonUtils.execAsync(sqlExistedUser);
                 if (!existedUser || existedUser.length === 0) {
@@ -29,20 +28,21 @@ async function authorizeUser(loginPassword) {
                     while (true) {
                         i++;
                         token = tokenObj.generate();
-                        let sqlExistedSessionWithToken = `SELECT ID FROM usersSession WHERE ID='${token}'`;
+                        let sqlExistedSessionWithToken = `SELECT ID FROM USERS_SESSION WHERE ID='${token}'`;
                         let ID = await commonUtils.execAsync(sqlExistedSessionWithToken);
                         if (!ID || ID.length === 0) {
                             break;
                         }
                     }
-
                     let userInfo = existedUser[0];
-                    let params = [token, userInfo["NAME"], userInfo["EMAIL"],
+                    let userId = userInfo["ID"]
+                    let params = [token, userId, userInfo["NAME"], userInfo["EMAIL"],
                         userInfo["LOGIN"]]
-                    await commonUtils.execAsync("INSERT INTO usersSession (ID,USER_NAME,USER_EMAIL,USER_LOGIN) " +
-                        " VALUES (?,?,?,?)", params);
+                    await commonUtils.execAsync("INSERT INTO USERS_SESSION (ID,USER_ID,USER_NAME,USER_EMAIL,USER_LOGIN) " +
+                        " VALUES (?,?,?,?,?)", params);
                     resolve({
                         id: token,
+                        userId: userId,
                         name: userInfo["NAME"],
                         email: userInfo["EMAIL"],
                         login: userInfo["LOGIN"]
@@ -59,7 +59,7 @@ async function authorizeUser(loginPassword) {
 async function logOutFromSession(token) {
     return new Promise(async (resolve, reject) => {
         try {
-            let sqlDeleteSession = `DELETE FROM  usersSession   WHERE ID='${token}'`;
+            let sqlDeleteSession = `DELETE FROM  USERS_SESSION   WHERE ID='${token}'`;
             await commonUtils.execAsync(sqlDeleteSession);
         } catch (err) {
             reject(statusResponse.internalError);
@@ -70,11 +70,9 @@ async function logOutFromSession(token) {
 async function checkSession(token) {
     return new Promise(async (resolve, reject) => {
         try {
-
-            let sqlPersonInfo = `SELECT * FROM usersSession WHERE ID='${token}'`;
+            let sqlPersonInfo = `SELECT * FROM USERS_SESSION WHERE ID='${token}'`;
             let ID = await commonUtils.execAsync(sqlPersonInfo);
             resolve(ID[0]);
-
         } catch (err) {
             reject(statusResponse.internalError);
         }

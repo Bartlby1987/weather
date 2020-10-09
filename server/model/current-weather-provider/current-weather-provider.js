@@ -2,14 +2,13 @@ const weathercomProvider = require('./weathercom/current-weathercom-weather-prov
 const yandexProvider = require('./yandex/current-yandex-weather-provider.js');
 const gismeteoProvider = require('./gismeteo/current-gismeteo-weather-provider.js');
 const cityNameResolve = require("./full-city-name-resolve");
-const commonUtilities = require("../common-utilities");
+const commonUtils = require("../common-utilities");
 const constants = require('../constant-list');
 
 const mappingProvider = {
     "yandex": yandexProvider,
     "gismeteo": gismeteoProvider,
     "weatherCom": weathercomProvider
-
 }
 
 function createCityWeatherData(addCity, sources) {
@@ -22,7 +21,7 @@ function createCityWeatherData(addCity, sources) {
         try {
             cityData[source] = provider.getWeather(addCity)
         } catch (e) {
-            commonUtilities.logDataLoadingError(source, e);
+            commonUtils.logDataLoadingError(source, e);
             cityData[source] = {temp: constants.NO_DATA, humidity: constants.NO_DATA}
         }
     }
@@ -47,10 +46,18 @@ function deleteRepeatCities(cities) {
     return Array.from(new Set(newCitiesArray));
 }
 
-function getCurrentWeather(citiesAndSource) {
+async function getCurrentWeather(token) {
+    // {cities:["Рим"],source:["yandex","gismeteo","weatherCom"]};
+    let userIdSql = `SELECT USER_ID FROM USERS_SESSION  WHERE ID='${token}'`;
+    let userId = (await commonUtils.execAsync(userIdSql))[0]["USER_ID"];
+    let sourcesSql = `SELECT s.NAME FROM USER_SOURCES us JOIN SOURCES s on us.SOURCE_ID= s.ID WHERE us.USER_ID=${userId}`
+    let sources = (await commonUtils.execAsync(sourcesSql)).map((el) => el["NAME"]);
     let newCitiesData = [];
-    let sources = citiesAndSource.source;
-    let citiesArray = deleteRepeatCities(citiesAndSource.cities);
+    let citiesSql = `SELECT CITIES FROM USERS_CITIES WHERE USER_ID='${userId}'`
+
+    let cities = (await commonUtils.execAsync(citiesSql)).map((el) => el["CITIES"]);
+
+    let citiesArray = deleteRepeatCities(cities);
     citiesArray = [...new Set(citiesArray)];
     if (citiesArray.length !== 0) {
         for (let i = 0; i < citiesArray.length; i++) {

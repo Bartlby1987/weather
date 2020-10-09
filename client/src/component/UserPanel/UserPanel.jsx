@@ -41,20 +41,30 @@ class UserPanel extends React.Component {
             spinnerOnThreeDays: false,
             error: false,
             errorResponse: null,
-            badResponse: true
+            badResponse: true,
         }
     };
+
+    changeForecastStatus() {
+        this.setState({showForecastWeather: !this.state.showForecastWeather});
+    }
 
     changeSpinnerStatus(value) {
         this.setState({spinnerOnThreeDays: value});
     }
 
-    changeThreeDayWeatherStatus(city) {
+    async changeThreeDayWeatherStatus(city) {
         let dateWeather = JSON.parse(JSON.stringify(this.state.cities));
         for (let i = 0; i < dateWeather.length; i++) {
             if (city === dateWeather[i]["city"]) {
                 dateWeather[i]["threeDayWeatherStatus"] = !dateWeather[i]["threeDayWeatherStatus"]
             }
+        }
+        let cityObj = {"city": city};
+        try {
+            await this.sendRequest(cityObj, "/weather/changeForecast", "POST");
+        } catch (err) {
+            console.error(err);
         }
         this.setState({cities: dateWeather});
     }
@@ -125,7 +135,7 @@ class UserPanel extends React.Component {
         return citiesAndSource
     }
 
-    onClickDeleteCity(city) {
+    async onClickDeleteCity(city) {
         let allCitiesData = this.state.cities;
         let newCitiesData = [];
         for (let i = 0; i < allCitiesData.length; i++) {
@@ -134,6 +144,8 @@ class UserPanel extends React.Component {
             }
         }
         this.setState({cities: newCitiesData});
+        let cityObj = {"city": city};
+        await this.sendRequest(cityObj, "/weather/deleteCity", "POST");
         localStorage.setItem(LOCAL_STORAGE_DATA_KEY, JSON.stringify(newCitiesData))
     }
 
@@ -161,57 +173,46 @@ class UserPanel extends React.Component {
         return sendPostIPARequest(citiesAndSource);
     }
 
-//todo the logic in this function should be split
 
-    onClickAddCity(city, callback) {
-
-
-        const url = "/weather/current";
-        let citiesData;
-        if ((typeof city) === "string") {
-            citiesData = this.createUpdatedCitiesList(city);
-            citiesData["cities"] = [city];
-        } else {
-            citiesData = this.createDataListForRefreshInformation();
-        }
-        const sendPostIPARequest = async (citiesData) => {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: citiesData
-            });
-            if (!response.ok) {
-                this.changeThreeDayWeatherStatus(city);
-                this.setState({error: !this.state.error, errorResponse: response});
-                return
-            }
-            let dataCityWeatherForAdding = await response.json();
-            if (callback) callback();
-            if (dataCityWeatherForAdding.length === 0) {
-                this.changeThreeDayWeatherStatus(city);
-                this.setState({badResponse: false});
-                return
-            }
-            if ((typeof city) === "object") {
-                return dataCityWeatherForAdding
-            }
-            let currentWeatherData = this.state.cities;
-            if (currentWeatherData) {
-                currentWeatherData.push(dataCityWeatherForAdding[0]);
-                this.setState({cities: currentWeatherData});
-                localStorage.setItem(LOCAL_STORAGE_DATA_KEY, JSON.stringify(currentWeatherData));
-                return currentWeatherData
-            } else {
-                currentWeatherData = dataCityWeatherForAdding;
-                this.setState({cities: currentWeatherData});
-                localStorage.setItem(LOCAL_STORAGE_DATA_KEY, JSON.stringify(currentWeatherData));
-                return currentWeatherData
+    sendRequest = async (data, url, method) => {
+        let obj = {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
             }
         };
-        return sendPostIPARequest((citiesData));
-    }
+        if (data) {
+            obj.body = JSON.stringify(data)
+        }
+        let response = await fetch(url, obj);
+        return await response.json();
+    };
+
+    async onClickAddCity(city, callback) {
+        let cityObj = {"city": city};
+        try {
+            let addCityResponse = await this.sendRequest(cityObj, "/weather/addCity", "POST");
+            if (addCityResponse === true) {
+                let currentWeatherResponse = await this.sendRequest(null, "/weather/current", "POST");
+                if (callback) callback();
+                let currentWeatherData = this.state.cities;
+                if (currentWeatherData) {
+                    currentWeatherData.push(currentWeatherResponse[0]);
+                    this.setState({cities: currentWeatherData});
+                    return currentWeatherData
+                } else {
+                    currentWeatherData = currentWeatherResponse;
+                    this.setState({cities: currentWeatherData});
+                    return currentWeatherData
+                }
+            } else {
+                this.setState({error: !this.state.error, errorResponse: addCityResponse});
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     async onClickRefreshData(callback) {
         let citiesAndSource = this.createDataListForRefreshInformation();
@@ -236,7 +237,7 @@ class UserPanel extends React.Component {
         localStorage.setItem(LOCAL_STORAGE_DATA_KEY, JSON.stringify(updateDataForAllCities));
         this.setState({cities: updateDataForAllCities});
         if (callback) callback();
-    }
+    };
 
     setThreeDayWeatherData(dateWeatherForThreeDay, city) {
         let citiesData = JSON.parse(JSON.stringify(this.state.cities));
@@ -247,7 +248,7 @@ class UserPanel extends React.Component {
             }
         }
         this.setState({cities: citiesData})
-    }
+    };
 
     async getWeatherOnThreeDays(city) {
         const url = "/weather/forecast";
@@ -284,13 +285,13 @@ class UserPanel extends React.Component {
             return (threeDaysWeatherData);
         };
         return await sendPostIPARequest(cityAndSource)
-    }
+    };
 
     async onClickShowWeatherOnThreeDays(city) {
         let threeDayWeatherData = await this.getWeatherOnThreeDays(city);
         this.setThreeDayWeatherData(threeDayWeatherData, city);
         return threeDayWeatherData
-    }
+    };
 
     onClickChangYandexFlag() {
         let source = this.state.source;
@@ -300,7 +301,7 @@ class UserPanel extends React.Component {
             localStorage.setItem(LOCAL_STORAGE_SOURCE_KEY, JSON.stringify(newSource));
             this.setState({source: newSource});
         }
-    }
+    };
 
     onClickChangDownloadsTimeFlag() {
         let source = this.state.source;
@@ -308,7 +309,7 @@ class UserPanel extends React.Component {
         newSource["downloadsTime"] = !newSource["downloadsTime"];
         localStorage.setItem(LOCAL_STORAGE_SOURCE_KEY, JSON.stringify(newSource));
         this.setState({source: newSource});
-    }
+    };
 
     onClickChangGismeteoFlag() {
         let source = this.state.source;
@@ -318,7 +319,7 @@ class UserPanel extends React.Component {
             localStorage.setItem(LOCAL_STORAGE_SOURCE_KEY, JSON.stringify(newSource));
             this.setState({source: newSource});
         }
-    }
+    };
 
     onClickChangWeatherFlag() {
         let source = this.state.source;
@@ -328,11 +329,16 @@ class UserPanel extends React.Component {
             localStorage.setItem(LOCAL_STORAGE_SOURCE_KEY, JSON.stringify(newSource));
             this.setState({source: newSource});
         }
-    }
+    };
 
     changeBadResponseStatus() {
         this.setState({badResponse: true});
-    }
+    };
+
+    async onClickSaveProperties() {
+        let source = this.state.source;
+        await this.sendRequest(source, "/weather/saveProperties", "POST")
+    };
 
     closePopup() {
         this.setState({error: !this.state.error, errorResponse: null});
@@ -341,7 +347,7 @@ class UserPanel extends React.Component {
     render() {
         let information;
         if (this.state.error) {
-            let errorMessage = (`Error status: ${this.state.errorResponse.status}  ${this.state.errorResponse.statusText}`);
+            let errorMessage = (` ${this.state.errorResponse}`);
             information = <div>
                 {this.state.error ?
                     <Popup
@@ -378,6 +384,7 @@ class UserPanel extends React.Component {
                     />}
                 />
                 <Route exact path="/userPanel/properties" render={() => <Properties
+                    onClickSaveProperties={this.onClickSaveProperties.bind(this)}
                     onOrOffSourceYandex={this.state.source.yandexFlag}
                     onOrOffSourceGismeteo={this.state.source.gismeteoFlag}
                     onOrOffSourceWeather={this.state.source.weatherFlag}
