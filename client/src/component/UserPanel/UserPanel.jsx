@@ -13,26 +13,27 @@ const LOCAL_STORAGE_SOURCE_KEY = 'Source';
 class UserPanel extends React.Component {
     constructor(props) {
         super(props);
-        let data = localStorage.getItem(LOCAL_STORAGE_DATA_KEY);
-        let source = localStorage.getItem(LOCAL_STORAGE_SOURCE_KEY);
-        if (!JSON.parse(source)) {
-            source = {
-                yandexFlag: true,
-                gismeteoFlag: false,
-                weatherFlag: false,
-                downloadsTime: false
-            }
-        } else {
-            source = JSON.parse(source)
-        }
-        try {
-            data = JSON.parse(data);
-        } catch (e) {
-            const localStorageErrorMessage = 'unable to load data from local storage.';
-            console.log(localStorageErrorMessage);
-            console.log('error:' + e);
-            data = [];
-        }
+        // let data = localStorage.getItem(LOCAL_STORAGE_DATA_KEY);
+        // let source = localStorage.getItem(LOCAL_STORAGE_SOURCE_KEY);
+        // if (!JSON.parse(source)) {
+        // } else {
+        //     source = JSON.parse(source)
+        // }
+        // try {
+        //     data = JSON.parse(data);
+        // } catch (e) {
+        //     const localStorageErrorMessage = 'unable to load data from local storage.';
+        //     console.log(localStorageErrorMessage);
+        //     console.log('error:' + e);
+        //     data = [];
+        // }
+        let data;
+        let source = {
+            yandexFlag: true,
+            gismeteoFlag: false,
+            weatherFlag: false,
+            downloadsTime: false
+        };
         data = data || [];
         this.state = {
             cities: data,
@@ -43,7 +44,14 @@ class UserPanel extends React.Component {
             errorResponse: null,
             badResponse: true,
         }
-    };
+    }
+
+    async componentDidMount() {
+        let promise = await this.sendRequest(null, '/weather/loadUserInfo', 'GET');
+
+
+    }
+
 
     changeForecastStatus() {
         this.setState({showForecastWeather: !this.state.showForecastWeather});

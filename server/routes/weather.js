@@ -5,6 +5,7 @@ let currentWeatherProvider = require('../model/current-weather-provider/current-
 let forecastCache = require('../cache/forecast-cache.js');
 const dataBase = require("../model/user-registration/registration-database");
 const authorization = require("../model/user-authorization/authorization");
+const {loadUserInfo} = require("../model/load-weather-data/load-weather-data");
 const {changeForecastStatus} = require("../model/change-forecast-status/change-forecast-status");
 const {saveProperties} = require("../model/save-properties/save-sources");
 const {deleteCity} = require("../model/delete-city/delete-city");
@@ -101,6 +102,18 @@ router.post('/addCity', async function (req, res) {
         res.json(err)
     }
 });
+
+
+router.get('/loadUserInfo', async function (req, res) {
+    let token = req.cookies.ID;
+    try {
+        let weatherData = await loadUserInfo(token);
+        res.json(weatherData);
+    } catch (err) {
+        res.json(err)
+    }
+});
+
 
 router.post('/deleteCity', async function (req, res) {
     let token = req.cookies.ID;

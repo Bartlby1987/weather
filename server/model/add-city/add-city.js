@@ -11,7 +11,7 @@ async function addCity(city, token) {
                 reject("Session is out. Log in again.");
             }
             let userSessionId = userId[0]["USER_ID"];
-            let cityExistsSql = `SELECT CITIES FROM USERS_CITIES  WHERE CITIES='${userCity}' AND USER_ID='${userId}'`;
+            let cityExistsSql = `SELECT CITIES FROM USERS_CITIES  WHERE CITIES='${userCity}' AND USER_ID='${userSessionId}'`;
             let cityExists = await commonUtils.execAsync(cityExistsSql);
             if (!cityExists || cityExists.length === 0) {
                 await commonUtils.execAsync(`INSERT INTO USERS_CITIES VALUES (?,?,?)`, [userSessionId, userCity, "false"]);
