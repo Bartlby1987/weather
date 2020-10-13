@@ -21,7 +21,7 @@ class App extends React.Component {
     async componentDidMount() {
         try {
             let promise = await this.sendRequest(null, '/weather/checkSession', 'GET');
-            if ("USER_NAME" in promise && "USER_EMAIL" in promise && "USER_LOGIN" in promise) {
+            if ("USER_ID" in promise) {
                 this.setState({personAuthorizationInfo: promise}, () => {
                     history.push('/userPanel/main')
                 })

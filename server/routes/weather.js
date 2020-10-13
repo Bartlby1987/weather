@@ -63,8 +63,9 @@ router.post('/logOut', async function (req, res) {
 
 router.post('/authorization', async function (req, res) {
     let loginPassword = req.body;
+    let token = req.cookies.ID;
     try {
-        let authorizationInfo = await authorization.authorizeUser(loginPassword);
+        let authorizationInfo = await authorization.authorizeUser(loginPassword, token);
         res.setHeader(`Set-Cookie`, `ID=${authorizationInfo["id"]}; HttpOnly; Path=/`)
         res.json(authorizationInfo);
     } catch (err) {
@@ -121,6 +122,15 @@ router.post('/deleteCity', async function (req, res) {
         let cities = (req.body)["city"];
         let weatherCityData = await deleteCity(cities, token);
         res.json(weatherCityData);
+    } catch (err) {
+        res.json(err)
+    }
+});
+router.post('/getSource', async function (req, res) {
+    let token = req.cookies.ID;
+    try {
+        let source = await getSource(token);
+        res.json(source);
     } catch (err) {
         res.json(err)
     }

@@ -46,17 +46,19 @@ function deleteRepeatCities(cities) {
     return Array.from(new Set(newCitiesArray));
 }
 
-async function getCurrentWeather(token) {
-    // {cities:["Рим"],source:["yandex","gismeteo","weatherCom"]};
-    let userIdSql = `SELECT USER_ID FROM USERS_SESSION  WHERE ID='${token}'`;
+async function getCurrentWeather(token, city = null) {
+    let cities;
+    let newCitiesData = [];
+    let userIdSql = `SELECT USER_ID FROM USERS_SESSIONS  WHERE ID='${token}'`;
     let userId = (await commonUtils.execAsync(userIdSql))[0]["USER_ID"];
     let sourcesSql = `SELECT s.NAME FROM USER_SOURCES us JOIN SOURCES s on us.SOURCE_ID= s.ID WHERE us.USER_ID=${userId}`
     let sources = (await commonUtils.execAsync(sourcesSql)).map((el) => el["NAME"]);
-    let newCitiesData = [];
-    let citiesSql = `SELECT CITIES FROM USERS_CITIES WHERE USER_ID='${userId}'`
-
-    let cities = (await commonUtils.execAsync(citiesSql)).map((el) => el["CITIES"]);
-
+    if (city === null) {
+        let citiesSql = `SELECT CITY FROM USERS_CITIES WHERE USER_ID='${userId}'`
+        cities = (await commonUtils.execAsync(citiesSql)).map((el) => el["CITY"]);
+    } else {
+        cities = city;
+    }
     let citiesArray = deleteRepeatCities(cities);
     citiesArray = [...new Set(citiesArray)];
     if (citiesArray.length !== 0) {

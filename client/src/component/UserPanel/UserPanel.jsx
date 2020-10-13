@@ -13,20 +13,7 @@ const LOCAL_STORAGE_SOURCE_KEY = 'Source';
 class UserPanel extends React.Component {
     constructor(props) {
         super(props);
-        // let data = localStorage.getItem(LOCAL_STORAGE_DATA_KEY);
-        // let source = localStorage.getItem(LOCAL_STORAGE_SOURCE_KEY);
-        // if (!JSON.parse(source)) {
-        // } else {
-        //     source = JSON.parse(source)
-        // }
-        // try {
-        //     data = JSON.parse(data);
-        // } catch (e) {
-        //     const localStorageErrorMessage = 'unable to load data from local storage.';
-        //     console.log(localStorageErrorMessage);
-        //     console.log('error:' + e);
-        //     data = [];
-        // }
+
         let data;
         let source = {
             yandexFlag: true,
@@ -47,12 +34,12 @@ class UserPanel extends React.Component {
     }
 
     async componentDidMount() {
-        let promise = await this.sendRequest(null, '/weather/loadUserInfo', 'GET');
+        let weather = await this.sendRequest(null, '/weather/loadUserInfo', 'GET');
+        let source = await this.sendRequest(null, '/weather/getSource', 'GET');
 
+        this.setState({cities: weather})
 
     }
-
-
     changeForecastStatus() {
         this.setState({showForecastWeather: !this.state.showForecastWeather});
     }
@@ -207,13 +194,11 @@ class UserPanel extends React.Component {
                 let currentWeatherData = this.state.cities;
                 if (currentWeatherData) {
                     currentWeatherData.push(currentWeatherResponse[0]);
-                    this.setState({cities: currentWeatherData});
-                    return currentWeatherData
                 } else {
                     currentWeatherData = currentWeatherResponse;
-                    this.setState({cities: currentWeatherData});
-                    return currentWeatherData
                 }
+                this.setState({cities: currentWeatherData});
+                return currentWeatherData
             } else {
                 this.setState({error: !this.state.error, errorResponse: addCityResponse});
             }

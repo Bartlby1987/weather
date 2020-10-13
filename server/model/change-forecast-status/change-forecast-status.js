@@ -2,7 +2,7 @@ const commonUtils = require("../common-utilities");
 
 async function changeForecastStatus(city, token) {
     return new Promise(async (resolve, reject) => {
-        let userIdSql = `SELECT USER_ID FROM USERS_SESSION  WHERE ID='${token}'`;
+        let userIdSql = `SELECT USER_ID FROM USERS_SESSIONS  WHERE ID='${token}'`;
         try {
             let userId = await commonUtils.execAsync(userIdSql);
             if (!userId || userId.length === 0) {
@@ -10,10 +10,10 @@ async function changeForecastStatus(city, token) {
             }
             let userSessionId = userId[0]["USER_ID"];
             city = city["city"];
-            let forecastStatus = await commonUtils.execAsync(`SELECT FORECAST FROM USERS_CITIES  WHERE USER_ID='${userSessionId}' AND CITIES='${city}'`);
-            let forecast = !JSON.parse(forecastStatus[0]["FORECAST"]);
-            await commonUtils.execAsync(`UPDATE USERS_CITIES SET FORECAST = '${forecast}' WHERE ` +
-                `USER_ID = ${userSessionId} AND CITIES='${city}'`);
+            let forecastStatus = await commonUtils.execAsync(`SELECT SHOW_FORECAST FROM USERS_CITIES  WHERE USER_ID='${userSessionId}' AND CITY='${city}'`);
+            let forecast = !JSON.parse(forecastStatus[0]["SHOW_FORECAST"]);
+            await commonUtils.execAsync(`UPDATE USERS_CITIES SET SHOW_FORECAST = '${forecast}' WHERE ` +
+                `USER_ID = ${userSessionId} AND CITY='${city}'`);
         } catch (error) {
             reject("Technical issue");
         }

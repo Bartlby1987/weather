@@ -2,7 +2,7 @@ const commonUtils = require("../common-utilities");
 
 async function saveProperties(source, token) {
     return new Promise(async (resolve, reject) => {
-        let userIdSql = `SELECT USER_ID FROM USERS_SESSION  WHERE ID='${token}'`;
+        let userIdSql = `SELECT USER_ID FROM USERS_SESSIONS  WHERE ID='${token}'`;
         try {
             let userId = await commonUtils.execAsync(userIdSql);
             if (!userId || userId.length === 0) {
@@ -10,9 +10,9 @@ async function saveProperties(source, token) {
             }
             let userSessionId = userId[0]["USER_ID"];
             let downloadsTime = source["downloadsTime"];
-            await commonUtils.execAsync(`UPDATE USERS SET TIME = '${downloadsTime}' WHERE ID = ${userSessionId}`);
+            await commonUtils.execAsync(`UPDATE USERS SET SHOW_TIME = '${downloadsTime}' WHERE ID = ${userSessionId}`);
             delete source["downloadsTime"];
-            let mappingObj = {"yandexFlag": 1, "gismeteoFlag": 2, "weatherFlag": 3, "downloadsTime": false};
+            let mappingObj = {"yandexFlag": 1, "gismeteoFlag": 2, "weatherFlag": 3};
             let map = new Map(Object.entries(source));
             await commonUtils.execAsync(`DELETE FROM USER_SOURCES WHERE USER_ID=${userSessionId}`);
             for (let [key, value] of map) {
