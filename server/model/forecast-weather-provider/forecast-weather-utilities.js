@@ -3,6 +3,7 @@ const weather = {
     "дождь": "Дождь",
     "снег": "Снег"
 }
+
 function getTransformHumidity(humidityData) {
     humidityData = humidityData.split(" ");
     let pathDataAboutWeather;

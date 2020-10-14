@@ -1,10 +1,12 @@
-let express = require("express");
-let router = express.Router();
-let bodyParser = require("body-parser");
-let currentWeatherProvider = require('../model/current-weather-provider/current-weather-provider.js');
-let forecastCache = require('../cache/forecast-cache.js');
+const express = require("express");
+const router = express.Router();
+const bodyParser = require("body-parser");
+const currentWeatherProvider = require('../model/current-weather-provider/current-weather-provider.js');
+const forecastCache = require('../cache/forecast-cache.js');
 const dataBase = require("../model/user-registration/registration-database");
 const authorization = require("../model/user-authorization/authorization");
+const {getForecastData} = require("../model/forecast-weather-provider/forecast-weather-provider");
+const {getSource} = require("../model/get-source/get-source");
 const {loadUserInfo} = require("../model/load-weather-data/load-weather-data");
 const {changeForecastStatus} = require("../model/change-forecast-status/change-forecast-status");
 const {saveProperties} = require("../model/save-properties/save-sources");
@@ -51,13 +53,13 @@ router.post('/saveProperties', async function (req, res) {
 router.post('/logOut', async function (req, res) {
     try {
         let token = req.cookies.ID;
-        req.session = null
-        res.clearCookie('ID', {path: '/'})
-        res.status(200).json('User Logged out')
+        req.session = null;
+        res.clearCookie('ID', {path: '/'});
+        res.status(200).json('User Logged out');
         await authorization.logOutFromSession(token);
-        res.json()
+        res.json();
     } catch (err) {
-        res.json(err)
+        res.json(err);
     }
 });
 
@@ -75,13 +77,15 @@ router.post('/authorization', async function (req, res) {
 
 router.post('/current', async function (req, res) {
     try {
+        let city = (req.body)["city"];
         let token = req.cookies.ID;
-        let weatherCityData = await currentWeatherProvider.getCurrentWeather(token);
-        res.json(weatherCityData);
+        let weatherCityData = await currentWeatherProvider.getCurrentWeather(token, [city]);
+        res.json(weatherCityData[0]);
     } catch (err) {
         res.json(err)
     }
 });
+
 router.post('/changeForecast', async function (req, res) {
     try {
         let token = req.cookies.ID;
@@ -104,7 +108,6 @@ router.post('/addCity', async function (req, res) {
     }
 });
 
-
 router.get('/loadUserInfo', async function (req, res) {
     let token = req.cookies.ID;
     try {
@@ -114,7 +117,6 @@ router.get('/loadUserInfo', async function (req, res) {
         res.json(err)
     }
 });
-
 
 router.post('/deleteCity', async function (req, res) {
     let token = req.cookies.ID;
@@ -126,7 +128,8 @@ router.post('/deleteCity', async function (req, res) {
         res.json(err)
     }
 });
-router.post('/getSource', async function (req, res) {
+
+router.get('/getSource', async function (req, res) {
     let token = req.cookies.ID;
     try {
         let source = await getSource(token);
@@ -136,15 +139,15 @@ router.post('/getSource', async function (req, res) {
     }
 });
 
-router.post('/forecast', function (req, res) {
+router.post('/forecast', async function (req, res) {
+    let token = req.cookies.ID;
     try {
         let citiesAndSource = req.body;
-        let weatherCityDataOnThreeDay = forecastCache.getForecast(citiesAndSource);
+        let weatherCityDataOnThreeDay = await getForecastData(citiesAndSource, token);
         res.json(weatherCityDataOnThreeDay);
     } catch (err) {
         res.json(err)
     }
 });
-
 
 module.exports = router;

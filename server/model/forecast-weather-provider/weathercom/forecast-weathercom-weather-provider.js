@@ -1,6 +1,7 @@
 const request = require('sync-request');
 const cheerio = require('cheerio');
 const fs = require("fs");
+const {getTransformHumidity} = require("../forecast-weather-utilities");
 let path = __dirname + "/weathercom-forecast-cache.json";
 const API_REQUEST = (value) => `https://api.openweathermap.org/data/2.5/weather?q=${value}` +
     `,&APPID=0b58b5094eddd4fdfa4a1fe10ca5034e`
@@ -15,19 +16,6 @@ const weatherData = {
     "clear": "Ясно",
     "rain": "Дождь",
     "snow": "Снег"
-}
-
-function getTransformHumidity(humidityData) {
-    humidityData = humidityData.split(" ");
-    let pathDataAboutWeather;
-    for (let i = 0; i < humidityData.length; i++) {
-        let humidity = humidityData[i];
-        pathDataAboutWeather = humidity.toLowerCase();
-        if (weatherData[pathDataAboutWeather]) {
-            return weatherData[pathDataAboutWeather]
-        }
-    }
-    return "Осадки"
 }
 
 function getForecastWeather(city) {

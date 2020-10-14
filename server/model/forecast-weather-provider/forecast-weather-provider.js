@@ -10,6 +10,24 @@ const mappingForecastProvider = {
     "weatherFlag": weathercomForecastProvider
 }
 
+async function getForecastData(city, token) {
+    city = city["city"];
+    let userIdSql = `SELECT USER_ID FROM USERS_SESSIONS  WHERE ID='${token}'`;
+    try {
+        let userId = (await commonUtils.execAsync(userIdSql))[0]["USER_ID"];
+        let sourcesSql = `SELECT s.NAME FROM USER_SOURCES us JOIN SOURCES s on us.SOURCE_ID= s.ID WHERE us.USER_ID=${userId}`
+        let sources = (await commonUtils.execAsync(sourcesSql)).map((el) => el["NAME"]);
+        let sourcesObj = commonUtils.changeSourceStructure(sources);
+        let cityAndSours = {
+            "citiesSource": sourcesObj,
+            "city": city
+        }
+        return await getForecastWeatherData(cityAndSours);
+    } catch (err) {
+        console.error(err);
+    }
+}
+
 function getForecastWeatherData(cityAndSource) {
     let city = cityAndSource.city;
     let requestedSourcesForecast = [];
@@ -36,5 +54,6 @@ function getForecastWeatherData(cityAndSource) {
 }
 
 module.exports = {
-    getForecastWeatherData: getForecastWeatherData
+    // getForecastWeatherData: getForecastWeatherData,
+    getForecastData: getForecastData
 };

@@ -18,9 +18,27 @@ async function execAsync(sql, params) {
     })
 }
 
+function changeSourceStructure(source) {
+    let sourceObj = {
+        yandexFlag: false,
+        gismeteoFlag: false,
+        weatherFlag: false,
+    };
+    for (let i = 0; i < source.length; i++) {
+        if (source[i] === "yandex") {
+            sourceObj.yandexFlag = true;
+        } else if (source[i] === "gismeteo") {
+            sourceObj.gismeteoFlag = true
+        } else if (source[i] === "weatherCom") {
+            sourceObj.weatherFlag = true;
+        }
+    }
+    return sourceObj;
+}
 
 module.exports = {
     logDataLoadingError: logDataLoadingError,
-    execAsync: execAsync
+    execAsync: execAsync,
+    changeSourceStructure: changeSourceStructure
 };
 
