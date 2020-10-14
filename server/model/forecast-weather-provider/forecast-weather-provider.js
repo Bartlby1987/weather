@@ -11,7 +11,6 @@ const mappingForecastProvider = {
 }
 
 async function getForecastData(city, token) {
-    city = city["city"];
     let userIdSql = `SELECT USER_ID FROM USERS_SESSIONS  WHERE ID='${token}'`;
     try {
         let userId = (await commonUtils.execAsync(userIdSql))[0]["USER_ID"];

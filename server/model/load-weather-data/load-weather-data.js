@@ -21,7 +21,7 @@ async function loadUserInfo(token) {
                 currentWeather = (await getCurrentWeather(token, [city]))[0];
                 if (showForecast) {
 
-                    currentWeather["threeDayData"] = getForecastData(city, token);
+                    currentWeather["threeDayData"] = await getForecastData(city, token);
                     currentWeather["threeDayWeatherStatus"] = showForecast;
                 }
                 weatherData.push(currentWeather);

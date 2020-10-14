@@ -142,8 +142,8 @@ router.get('/getSource', async function (req, res) {
 router.post('/forecast', async function (req, res) {
     let token = req.cookies.ID;
     try {
-        let citiesAndSource = req.body;
-        let weatherCityDataOnThreeDay = await getForecastData(citiesAndSource, token);
+        let city = (req.body)["city"];
+        let weatherCityDataOnThreeDay = await getForecastData(city, token);
         res.json(weatherCityDataOnThreeDay);
     } catch (err) {
         res.json(err)
