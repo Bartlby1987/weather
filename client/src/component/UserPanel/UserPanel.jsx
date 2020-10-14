@@ -201,20 +201,28 @@ class UserPanel extends React.Component {
     //     return await sendPostIPARequest(cityAndSource)
     // };
 
-    async getWeatherOnThreeDays(city) {
+    async getWeatherOnThreeDays(city, callback) {
         try {
-            let re = await this.sendRequest({"city": city}, "/weather/forecast", "POST")
-            return re
+            let forecast = await this.sendRequest({"city": city}, "/weather/forecast", "POST")
+            let weatherData = [...this.state.cities];
+            let newWeatherData = weatherData.map((elem) => {
+                if (elem["city"] === city) {
+                    elem["threeDayWeatherStatus"] = true;
+                    elem["threeDayData"] = forecast;
+                }
+            })
+            this.setState({cities: newWeatherData})
+            if (callback) callback();
         } catch (err) {
             console.error(err);
         }
     };
 
-    async onClickShowWeatherOnThreeDays(city) {
-        let threeDayWeatherData = await this.getWeatherOnThreeDays(city);
-        this.setThreeDayWeatherData(threeDayWeatherData, city);
-        return threeDayWeatherData
-    };
+    // async onClickShowWeatherOnThreeDays(city) {
+    //     let threeDayWeatherData = await this.getWeatherOnThreeDays(city);
+    //     this.setThreeDayWeatherData(threeDayWeatherData, city);
+    //     return threeDayWeatherData
+    // };
 
     onClickChangYandexFlag() {
         let source = this.state.source;
@@ -303,7 +311,7 @@ class UserPanel extends React.Component {
                         source={this.state.source}
                         onClickRefreshData={this.onClickRefreshData.bind(this)}
                         threeDaysWeather={this.state.threeDaysWeather}
-                        onClickShowWeatherOnThreeDays={(city) => this.onClickShowWeatherOnThreeDays(city)}
+                        onClickShowWeatherOnThreeDays={(city) => this.getWeatherOnThreeDays(city)}
                     />}
                 />
                 <Route exact path="/userPanel/properties" render={() => <Properties
