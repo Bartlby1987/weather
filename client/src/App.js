@@ -20,7 +20,7 @@ class App extends React.Component {
 
     async componentDidMount() {
         try {
-            let promise = await this.sendRequest(null, '/weather/checkSession', 'GET');
+            let promise = await this.sendRequest(null, '/users/checkSession', 'GET');
             if ("USER_ID" in promise) {
                 this.setState({personAuthorizationInfo: promise}, () => {
                     history.push('/userPanel/main')
@@ -58,14 +58,14 @@ class App extends React.Component {
     };
 
     async sendingUserRegistrationInformation(userInfo) {
-        const url = "weather/registration";
+        const url = "users/registration";
         const method = "POST";
         let responseStatus = await this.sendRequest(userInfo, url, method)
         this.setState({"statusRegistration": responseStatus})
     }
 
     async sendingUserAuthorizationInformation(LoginPassword) {
-        const url = "weather/authorization";
+        const url = "users/authorization";
         const method = "POST";
         let response = await this.sendRequest(LoginPassword, url, method)
         console.log(response);
@@ -76,7 +76,7 @@ class App extends React.Component {
         this.setState({"errorAuthorization": response})
     }
     async logOutFromSession() {
-        const url = "/weather/logOut";
+        const url = "/users/logOut";
         await this.sendRequest(null, url, "POST")
         this.setState({"personAuthorizationInfo": ""})
         history.push('/');

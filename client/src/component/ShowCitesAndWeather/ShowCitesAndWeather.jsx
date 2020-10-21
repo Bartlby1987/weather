@@ -14,7 +14,6 @@ class ShowCitesAndWeather extends React.Component {
         for (let i = 0; i < weatherData.length; i++) {
             let dataComponent = <div key={i}>
                 <ShowCityAndWeather
-                    changeThreeDayWeatherStatus={this.props.changeThreeDayWeatherStatus}
                     weather={weatherData[i]}
                     spinnerOnThreeDays={this.props.spinnerOnThreeDays}
                     delete={deleteCity} source={source}

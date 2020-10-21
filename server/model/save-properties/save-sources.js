@@ -20,6 +20,7 @@ async function saveProperties(source, token) {
                     await commonUtils.execAsync(`INSERT INTO USER_SOURCES (USER_ID,SOURCE_ID) VALUES ('${userSessionId}', '${mappingObj[key]}')`);
                 }
             }
+            resolve(true);
         } catch (error) {
             reject("Technical issue");
         }

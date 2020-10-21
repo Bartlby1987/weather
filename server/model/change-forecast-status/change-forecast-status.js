@@ -14,6 +14,7 @@ async function changeForecastStatus(city, token) {
             let forecast = !JSON.parse(forecastStatus[0]["SHOW_FORECAST"]);
             await commonUtils.execAsync(`UPDATE USERS_CITIES SET SHOW_FORECAST = '${forecast}' WHERE ` +
                 `USER_ID = ${userSessionId} AND CITY='${city}'`);
+            resolve(true)
         } catch (error) {
             reject("Technical issue");
         }

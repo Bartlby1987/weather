@@ -7,9 +7,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import {Route} from 'react-router-dom';
 import Popup from "../ShowCitesAndWeather/ShowCityAndWeather/PopUp/PopUp";
 
-// const LOCAL_STORAGE_DATA_KEY = 'CitiesData';
-// const LOCAL_STORAGE_SOURCE_KEY = 'Source';
-
 class UserPanel extends React.Component {
     constructor(props) {
         super(props);
@@ -31,68 +28,15 @@ class UserPanel extends React.Component {
             badResponse: true,
         }
     }
+
     async componentDidMount() {
         await this.onClickRefreshData();
-    }
-
-    changeForecastStatus() {
-        this.setState({showForecastWeather: !this.state.showForecastWeather});
     }
 
     changeSpinnerStatus(value) {
         this.setState({spinnerOnThreeDays: value});
     }
 
-    async changeThreeDayWeatherStatus(city) {
-        let dateWeather = JSON.parse(JSON.stringify(this.state.cities));
-        for (let i = 0; i < dateWeather.length; i++) {
-            if (city === dateWeather[i]["city"]) {
-                dateWeather[i]["threeDayWeatherStatus"] = !dateWeather[i]["threeDayWeatherStatus"]
-            }
-        }
-        let cityObj = {"city": city};
-        try {
-            await this.sendRequest(cityObj, "/weather/changeForecast", "POST");
-        } catch (err) {
-            console.error(err);
-        }
-        this.setState({cities: dateWeather});
-    }
-
-    // createUpdatedCitiesList(city) {
-    //     let citiesData = this.state.cities;
-    //     let yandex = this.state.source.yandexFlag;
-    //     let gismeteo = this.state.source.gismeteoFlag;
-    //     let weather = this.state.source.weatherFlag;
-    //     let source = [];
-    //     let cities = [];
-    //     let citiesAndSource = {};
-    //     if (citiesData.length !== 0) {
-    //         for (let i = 0; i < citiesData.length; i++) {
-    //             let cityAndData = citiesData[i];
-    //             cities.push(cityAndData.city)
-    //         }
-    //     } else {
-    //         cities.push(city)
-    //     }
-    //     if (yandex) {
-    //         source.push("yandex")
-    //     }
-    //     if (gismeteo) {
-    //         source.push("gismeteo")
-    //     }
-    //     if (weather) {
-    //         source.push("weatherCom")
-    //     }
-    //     for (let k = 0; k < cities.length; k++) {
-    //         if (cities[k] !== city) {
-    //             cities.push(city)
-    //         }
-    //     }
-    //     citiesAndSource["cities"] = cities;
-    //     citiesAndSource["source"] = source;
-    //     return citiesAndSource
-    // }
     async onClickDeleteCity(city) {
         let allCitiesData = this.state.cities;
         let newCitiesData = [];
@@ -104,7 +48,6 @@ class UserPanel extends React.Component {
         this.setState({cities: newCitiesData});
         let cityObj = {"city": city};
         await this.sendRequest(cityObj, "/weather/deleteCity", "POST");
-        // localStorage.setItem(LOCAL_STORAGE_DATA_KEY, JSON.stringify(newCitiesData))
     }
 
     sendRequest = async (data, url, method) => {
@@ -147,89 +90,38 @@ class UserPanel extends React.Component {
     };
 
     async onClickRefreshData(callback) {
-        let weather = await this.sendRequest(null, '/weather/loadUserInfo', 'GET');
-        let source = await this.sendRequest(null, '/weather/getSource', 'GET');
+        let weather = await this.sendRequest(null, '/users/loadUserInfo', 'GET');
+        let source = await this.sendRequest(null, '/users/getSource', 'GET');
         if (callback) callback();
         this.setState({cities: weather, source: source})
     };
 
-    setThreeDayWeatherData(dateWeatherForThreeDay, city) {
-        let citiesData = JSON.parse(JSON.stringify(this.state.cities));
-        for (let i = 0; i < citiesData.length; i++) {
-            let cityData = citiesData[i];
-            if (cityData["city"] === city) {
-                cityData["threeDayData"] = dateWeatherForThreeDay;
-            }
-        }
-        this.setState({cities: citiesData})
-    };
-
-    // async getWeatherOnThreeDays(city) {
-    //     const url = "/weather/forecast";
-    //     let cloneSource = JSON.parse(JSON.stringify(this.state.source));
-    //     let newSource = {
-    //         yandexFlag: cloneSource.yandexFlag,
-    //         gismeteoFlag: cloneSource.gismeteoFlag,
-    //         weatherFlag: cloneSource.weatherFlag
-    //     };
-    //     let cityAndSource = {
-    //         citiesSource: newSource,
-    //         city: city
-    //     };
-    //     let sendPostIPARequest = async (cityAndSource) => {
-    //         let response = await fetch(url, {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //             body: (JSON.stringify(cityAndSource))
-    //         });
-    //         if (!response.ok) {
-    //             this.changeThreeDayWeatherStatus(city);
-    //             this.setState({error: !this.state.error, errorResponse: response});
-    //             return
-    //         }
-    //
-    //         let threeDaysWeatherData = await response.json();
-    //         if (threeDaysWeatherData.length === 0) {
-    //             this.changeThreeDayWeatherStatus(city);
-    //             this.setState({badResponse: false});
-    //             return
-    //         }
-    //         return (threeDaysWeatherData);
-    //     };
-    //     return await sendPostIPARequest(cityAndSource)
-    // };
-
     async getWeatherOnThreeDays(city, callback) {
         try {
             let forecast = await this.sendRequest({"city": city}, "/weather/forecast", "POST")
-            let weatherData = [...this.state.cities];
-            let newWeatherData = weatherData.map((elem) => {
-                if (elem["city"] === city) {
-                    elem["threeDayWeatherStatus"] = true;
-                    elem["threeDayData"] = forecast;
+            await this.sendRequest({"city": city}, "/weather/changeForecast", "POST")
+            let newWeatherData = [...this.state.cities];
+            for (let i = 0; i < newWeatherData.length; i++) {
+                let cityObj = newWeatherData[i];
+                if (cityObj["city"] === city) {
+                    if (!cityObj["threeDayData"]) {
+                        cityObj["threeDayData"] = forecast;
+                    }
+                    cityObj["threeDayWeatherStatus"] = !cityObj["threeDayWeatherStatus"];
                 }
-            })
-            this.setState({cities: newWeatherData})
+            }
             if (callback) callback();
+            this.setState({cities: newWeatherData})
         } catch (err) {
             console.error(err);
         }
     };
-
-    // async onClickShowWeatherOnThreeDays(city) {
-    //     let threeDayWeatherData = await this.getWeatherOnThreeDays(city);
-    //     this.setThreeDayWeatherData(threeDayWeatherData, city);
-    //     return threeDayWeatherData
-    // };
 
     onClickChangYandexFlag() {
         let source = this.state.source;
         let newSource = JSON.parse(JSON.stringify(source));
         if (newSource["gismeteoFlag"] === true || newSource["weatherFlag"] === true) {
             newSource["yandexFlag"] = !newSource["yandexFlag"];
-            // localStorage.setItem(LOCAL_STORAGE_SOURCE_KEY, JSON.stringify(newSource));
             this.setState({source: newSource});
         }
     };
@@ -238,7 +130,6 @@ class UserPanel extends React.Component {
         let source = this.state.source;
         let newSource = JSON.parse(JSON.stringify(source));
         newSource["downloadsTime"] = !newSource["downloadsTime"];
-        // localStorage.setItem(LOCAL_STORAGE_SOURCE_KEY, JSON.stringify(newSource));
         this.setState({source: newSource});
     };
 
@@ -247,7 +138,6 @@ class UserPanel extends React.Component {
         let newSource = JSON.parse(JSON.stringify(source));
         if (newSource["yandexFlag"] === true || newSource["weatherFlag"] === true) {
             newSource["gismeteoFlag"] = !newSource["gismeteoFlag"];
-            // localStorage.setItem(LOCAL_STORAGE_SOURCE_KEY, JSON.stringify(newSource));
             this.setState({source: newSource});
         }
     };
@@ -257,7 +147,6 @@ class UserPanel extends React.Component {
         let newSource = JSON.parse(JSON.stringify(source));
         if (newSource["gismeteoFlag"] === true || newSource["yandexFlag"] === true) {
             newSource["weatherFlag"] = !newSource["weatherFlag"];
-            // localStorage.setItem(LOCAL_STORAGE_SOURCE_KEY, JSON.stringify(newSource));
             this.setState({source: newSource});
         }
     };
@@ -268,7 +157,7 @@ class UserPanel extends React.Component {
 
     async onClickSaveProperties() {
         let source = this.state.source;
-        await this.sendRequest(source, "/weather/saveProperties", "POST")
+        await this.sendRequest(source, "/users/saveProperties", "POST")
     };
 
     closePopup() {
@@ -302,8 +191,6 @@ class UserPanel extends React.Component {
                         logOutFromSession={this.props.logOutFromSession}/>
                 <Route exact path="/userPanel/main" render={() =>
                     <ShowCitesAndWeather
-                        changeThreeDayWeatherStatus={this.changeThreeDayWeatherStatus.bind(this)}
-                        spinnerOnThreeDays={this.state.spinnerOnThreeDays}
                         changeSpinnerStatus={this.changeSpinnerStatus.bind(this)}
                         cities={this.state.cities}
                         addCity={this.onClickAddCity.bind(this)}

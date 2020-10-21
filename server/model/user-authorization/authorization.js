@@ -49,10 +49,10 @@ async function authorizeUser(loginPassword, sessionId) {
     )
 }
 
-async function logOutFromSession(token) {
+async function logOutFromSession() {
     return new Promise(async (resolve, reject) => {
         try {
-            let sqlDeleteSession = `DELETE FROM  USERS_SESSIONS   WHERE ID='${token}'`;
+            let sqlDeleteSession = `DELETE FROM  USERS_SESSIONS`;
             await commonUtils.execAsync(sqlDeleteSession);
         } catch (err) {
             reject(statusResponse.internalError);

@@ -15,7 +15,7 @@ class ShowCityAndWeather extends React.Component {
             isLoading: true,
             blogItems: [],
             isFetching: false,
-            spinnerOnThreeDays: false,
+            // spinnerOnThreeDays: false,
             timeOn: this.props.source.downloadsTime
         };
         this._isMounted = false;
@@ -37,7 +37,6 @@ class ShowCityAndWeather extends React.Component {
     async onClickShowThreeDaysWeather() {
         this.setState({spinnerOnThreeDays: true});
         let city = this.props.weather.city;
-        this.props.changeThreeDayWeatherStatus(city);
         if (!this.state.showThreeDaysWeather) {
             await this.props.onClickShowWeatherOnThreeDays(city)
         }
