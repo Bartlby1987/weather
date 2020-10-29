@@ -12,11 +12,6 @@ const FIRST_DAY_VALUE = 1;
 const SECOND_DAY_VALUE = 2;
 const THIRD_DAY_VALUE = 3;
 const mappingProvider = [{"dayIndex": FIRST_DAY_VALUE}, {"dayIndex": SECOND_DAY_VALUE}, {"dayIndex": THIRD_DAY_VALUE}];
-const weatherData = {
-    "clear": "Ясно",
-    "rain": "Дождь",
-    "snow": "Снег"
-}
 
 function getForecastWeather(city) {
     let oldData;

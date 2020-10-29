@@ -5,7 +5,6 @@ import {Route, Router} from 'react-router-dom';
 import UserPanel from "./component/UserPanel/UserPanel";
 import Popup from "./component/ShowCitesAndWeather/ShowCityAndWeather/PopUp/PopUp";
 import 'bootstrap/dist/css/bootstrap.min.css';
-
 import {createBrowserHistory} from "history";
 const history = createBrowserHistory();
 class App extends React.Component {
@@ -76,8 +75,8 @@ class App extends React.Component {
         this.setState({"errorAuthorization": response})
     }
     async logOutFromSession() {
-        const url = "/users/logOut";
-        await this.sendRequest(null, url, "POST")
+        const url = "/users/logout";
+        await this.sendRequest(null, url, "GET")
         this.setState({"personAuthorizationInfo": ""})
         history.push('/');
     }

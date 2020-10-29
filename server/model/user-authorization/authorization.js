@@ -55,26 +55,14 @@ async function logOutFromSession() {
             let sqlDeleteSession = `DELETE FROM  USERS_SESSIONS`;
             await commonUtils.execAsync(sqlDeleteSession);
         } catch (err) {
+            console.error(err);
             reject(statusResponse.internalError);
         }
     })
 }
 
-async function checkSession(token) {
-    return new Promise(async (resolve, reject) => {
-        try {
-            let sqlPersonInfo = `SELECT * FROM USERS_SESSIONS WHERE ID='${token}'`;
-            let ID = await commonUtils.execAsync(sqlPersonInfo);
-            resolve(ID[0]);
-        } catch (err) {
-            reject(statusResponse.internalError);
-        }
-    });
-}
-
 
 module.exports = {
     authorizeUser: authorizeUser,
-    checkSession: checkSession,
     logOutFromSession: logOutFromSession
 }

@@ -1,6 +1,7 @@
 const express = require('express');
 const authorization = require("../model/user-authorization/authorization");
 const dataBase = require("../model/user-registration/registration-database");
+const {getUserId} = require("../model/common-utilities");
 const {saveProperties} = require("../model/save-properties/save-sources");
 const {loadUserInfo} = require("../model/load-weather-data/load-weather-data");
 const {getSource} = require("../model/get-source/get-source");
@@ -11,7 +12,7 @@ router.get('/', function (req, res, next) {
     res.send('respond with a resource');
 });
 
-router.post('/logOut', async function (req, res) {
+router.get('/logout', async function (req, res) {
     try {
         req.session = null;
         res.clearCookie('ID', {path: '/'});
@@ -26,13 +27,14 @@ router.post('/logOut', async function (req, res) {
 router.get('/checkSession', async function (req, res) {
     try {
         let token = req.cookies.ID;
-        if (!token) {
+        let userId = await getUserId(token);
+        if (!token || !userId) {
             res.send()
         }
-        let sessionInfo = await authorization.checkSession(token);
-        res.json(sessionInfo)
+        res.json({"USER_ID": userId})
     } catch (err) {
-        res.json(err)
+        console.error(err);
+        res.json("Internal Server Error.")
     }
 });
 
@@ -61,8 +63,11 @@ router.post('/authorization', async function (req, res) {
 router.get('/loadUserInfo', async function (req, res) {
     let token = req.cookies.ID;
     try {
-        let weatherData = await loadUserInfo(token);
-        res.json(weatherData);
+        let userId = await getUserId(token);
+        if (userId) {
+            let weatherData = await loadUserInfo(userId);
+            res.json(weatherData);
+        }
     } catch (err) {
         res.json(err)
     }
@@ -71,8 +76,11 @@ router.get('/loadUserInfo', async function (req, res) {
 router.get('/getSource', async function (req, res) {
     let token = req.cookies.ID;
     try {
-        let source = await getSource(token);
-        res.json(source);
+        let userId = await getUserId(token);
+        if (userId) {
+            let source = await getSource(userId);
+            res.json(source);
+        }
     } catch (err) {
         res.json(err)
     }
@@ -82,8 +90,11 @@ router.post('/saveProperties', async function (req, res) {
     let source = req.body;
     let token = req.cookies.ID;
     try {
-        let msg = await saveProperties(source, token);
-        res.json(msg)
+        let userId = await getUserId(token);
+        if (userId) {
+            let msg = await saveProperties(source, userId);
+            res.json(msg)
+        }
     } catch (error) {
         res.json(error)
     }

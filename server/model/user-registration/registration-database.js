@@ -28,6 +28,7 @@ async function addUserRegistrationInformation(registrationData) {
                 reject(statusResponse.loginUsed)
             }
         } catch (error) {
+            console.error(error);
             reject("technical issue");
         }
     })

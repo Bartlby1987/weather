@@ -72,9 +72,8 @@ class UserPanel extends React.Component {
             if (addCityResponse === true) {
                 let currentWeatherResponse = await this.sendRequest(cityObj, "/weather/current", "POST");
                 if (callback) callback();
-                let currentWeatherData = this.state.cities;
+                let currentWeatherData = JSON.parse(JSON.stringify(this.state.cities));
                 if (currentWeatherData) {
-
                     currentWeatherData.push(currentWeatherResponse);
                 } else {
                     currentWeatherData = currentWeatherResponse;
@@ -90,62 +89,72 @@ class UserPanel extends React.Component {
     };
 
     async onClickRefreshData(callback) {
-        let weather = await this.sendRequest(null, '/users/loadUserInfo', 'GET');
-        let source = await this.sendRequest(null, '/users/getSource', 'GET');
-        if (callback) callback();
-        this.setState({cities: weather, source: source})
+        await Promise.all([this.sendRequest(null, '/users/loadUserInfo', 'GET'),
+            this.sendRequest(null, '/users/getSource', 'GET')])
+            .then(response => {
+                if (callback) callback();
+                this.setState({cities: response[0], source: response[1]})
+            });
     };
 
     async getWeatherOnThreeDays(city, callback) {
-        try {
-            let forecast = await this.sendRequest({"city": city}, "/weather/forecast", "POST")
-            await this.sendRequest({"city": city}, "/weather/changeForecast", "POST")
-            let newWeatherData = [...this.state.cities];
-            for (let i = 0; i < newWeatherData.length; i++) {
-                let cityObj = newWeatherData[i];
-                if (cityObj["city"] === city) {
-                    if (!cityObj["threeDayData"]) {
-                        cityObj["threeDayData"] = forecast;
-                    }
-                    cityObj["threeDayWeatherStatus"] = !cityObj["threeDayWeatherStatus"];
-                }
+        let citiesInfo = JSON.parse(JSON.stringify(this.state.cities));
+        for (let i = 0; i < citiesInfo.length; i++) {
+            let cityInfo = citiesInfo[i];
+            if (cityInfo["city"] === city && cityInfo["threeDayWeatherStatus"]) {
+                cityInfo["threeDayWeatherStatus"] = !cityInfo["threeDayWeatherStatus"]
+                await this.sendRequest({"city": city}, "/weather/changeForecast", "POST");
+                this.setState({cities: citiesInfo})
+                if (callback) callback();
+                return;
             }
-            if (callback) callback();
-            this.setState({cities: newWeatherData})
-        } catch (err) {
-            console.error(err);
         }
+        Promise.all([(this.sendRequest({"city": city}, "/weather/forecast", "POST")),
+            (this.sendRequest({"city": city}, "/weather/changeForecast", "POST"))])
+            .then(response => {
+                try {
+                    for (let i = 0; i < citiesInfo.length; i++) {
+                        let cityObj = citiesInfo[i];
+                        if (cityObj["city"] === city) {
+                            if (!cityObj["threeDayData"]) {
+                                cityObj["threeDayData"] = response[0];
+                            }
+                            cityObj["threeDayWeatherStatus"] = !cityObj["threeDayWeatherStatus"];
+                        }
+                    }
+                    this.setState({cities: citiesInfo})
+                    if (callback) callback();
+                } catch (err) {
+                    console.error(err);
+                }
+            })
     };
 
-    onClickChangYandexFlag() {
-        let source = this.state.source;
-        let newSource = JSON.parse(JSON.stringify(source));
-        if (newSource["gismeteoFlag"] === true || newSource["weatherFlag"] === true) {
+    onClickChangeDownloadsTimeFlag() {
+        let newSource = JSON.parse(JSON.stringify(this.state.source));
+        newSource["downloadsTime"] = !newSource["downloadsTime"];
+        this.setState({source: newSource});
+    };
+
+    onClickChangeYandexFlag() {
+        let newSource = JSON.parse(JSON.stringify(this.state.source));
+        if (newSource["gismeteoFlag"] || newSource["weatherFlag"]) {
             newSource["yandexFlag"] = !newSource["yandexFlag"];
             this.setState({source: newSource});
         }
     };
 
-    onClickChangDownloadsTimeFlag() {
-        let source = this.state.source;
-        let newSource = JSON.parse(JSON.stringify(source));
-        newSource["downloadsTime"] = !newSource["downloadsTime"];
-        this.setState({source: newSource});
-    };
-
-    onClickChangGismeteoFlag() {
-        let source = this.state.source;
-        let newSource = JSON.parse(JSON.stringify(source));
-        if (newSource["yandexFlag"] === true || newSource["weatherFlag"] === true) {
+    onClickChangeGismeteoFlag() {
+        let newSource = JSON.parse(JSON.stringify(this.state.source));
+        if (newSource["yandexFlag"] || newSource["weatherFlag"]) {
             newSource["gismeteoFlag"] = !newSource["gismeteoFlag"];
             this.setState({source: newSource});
         }
     };
 
-    onClickChangWeatherFlag() {
-        let source = this.state.source;
-        let newSource = JSON.parse(JSON.stringify(source));
-        if (newSource["gismeteoFlag"] === true || newSource["yandexFlag"] === true) {
+    onClickChangeWeatherFlag() {
+        let newSource = JSON.parse(JSON.stringify(this.state.source));
+        if (newSource["gismeteoFlag"] || newSource["yandexFlag"]) {
             newSource["weatherFlag"] = !newSource["weatherFlag"];
             this.setState({source: newSource});
         }
@@ -191,14 +200,14 @@ class UserPanel extends React.Component {
                         logOutFromSession={this.props.logOutFromSession}/>
                 <Route exact path="/userPanel/main" render={() =>
                     <ShowCitesAndWeather
+                        spinnerOnThreeDays={this.state.spinnerOnThreeDays}
                         changeSpinnerStatus={this.changeSpinnerStatus.bind(this)}
                         cities={this.state.cities}
                         addCity={this.onClickAddCity.bind(this)}
                         delete={this.onClickDeleteCity.bind(this)}
                         source={this.state.source}
                         onClickRefreshData={this.onClickRefreshData.bind(this)}
-                        threeDaysWeather={this.state.threeDaysWeather}
-                        onClickShowWeatherOnThreeDays={(city) => this.getWeatherOnThreeDays(city)}
+                        onClickShowWeatherOnThreeDays={(city, callback) => this.getWeatherOnThreeDays(city, callback)}
                     />}
                 />
                 <Route exact path="/userPanel/properties" render={() => <Properties
@@ -207,10 +216,10 @@ class UserPanel extends React.Component {
                     onOrOffSourceGismeteo={this.state.source.gismeteoFlag}
                     onOrOffSourceWeather={this.state.source.weatherFlag}
                     timeFlag={this.state.source.downloadsTime}
-                    yandexFlag={this.onClickChangYandexFlag.bind(this)}
-                    gismeteoFlag={this.onClickChangGismeteoFlag.bind(this)}
-                    onClickChangDownloadsTimeFlag={this.onClickChangDownloadsTimeFlag.bind(this)}
-                    weatherFlag={this.onClickChangWeatherFlag.bind(this)}/>}/>
+                    yandexFlag={this.onClickChangeYandexFlag.bind(this)}
+                    gismeteoFlag={this.onClickChangeGismeteoFlag.bind(this)}
+                    onClickChangDownloadsTimeFlag={this.onClickChangeDownloadsTimeFlag.bind(this)}
+                    weatherFlag={this.onClickChangeWeatherFlag.bind(this)}/>}/>
             </div>;
         }
         return (

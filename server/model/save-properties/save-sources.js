@@ -1,14 +1,8 @@
 const commonUtils = require("../common-utilities");
 
-async function saveProperties(source, token) {
+async function saveProperties(source, userSessionId) {
     return new Promise(async (resolve, reject) => {
-        let userIdSql = `SELECT USER_ID FROM USERS_SESSIONS  WHERE ID='${token}'`;
         try {
-            let userId = await commonUtils.execAsync(userIdSql);
-            if (!userId || userId.length === 0) {
-                reject("Session is out. Log in again.");
-            }
-            let userSessionId = userId[0]["USER_ID"];
             let downloadsTime = source["downloadsTime"];
             await commonUtils.execAsync(`UPDATE USERS SET SHOW_TIME = '${downloadsTime}' WHERE ID = ${userSessionId}`);
             delete source["downloadsTime"];
@@ -22,6 +16,7 @@ async function saveProperties(source, token) {
             }
             resolve(true);
         } catch (error) {
+            console.error(error);
             reject("Technical issue");
         }
     })

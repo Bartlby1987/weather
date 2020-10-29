@@ -3,7 +3,6 @@ import './ShowCityAndWeather.css';
 import ThreeDaysWeather from "./ThreeDaysWeather/ThreeDaysWeather";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Spinner from "../../Spinner/Spinner";
-
 const DATA_NOT_AVAILABLE_TEXT = "Данных нет";
 
 class ShowCityAndWeather extends React.Component {
@@ -15,18 +14,9 @@ class ShowCityAndWeather extends React.Component {
             isLoading: true,
             blogItems: [],
             isFetching: false,
-            // spinnerOnThreeDays: false,
-            timeOn: this.props.source.downloadsTime
+            timeOn: this.props.source.downloadsTime,
+            spinnerStatus: false
         };
-        this._isMounted = false;
-    }
-
-    componentDidMount() {
-        this._isMounted = true;
-    }
-
-    componentWillUnmount() {
-        this._isMounted = false;
     }
 
     deleteCity() {
@@ -34,17 +24,21 @@ class ShowCityAndWeather extends React.Component {
         this.props.delete(deleteCity);
     }
 
+    changeSpinnerStatus(status = false) {
+        this.setState({spinnerOn: status})
+    }
+
     async onClickShowThreeDaysWeather() {
-        this.setState({spinnerOnThreeDays: true});
+        this.setState({spinnerStatus: true});
         let city = this.props.weather.city;
         if (!this.state.showThreeDaysWeather) {
-            await this.props.onClickShowWeatherOnThreeDays(city)
+            await this.props.onClickShowWeatherOnThreeDays(city, () => {
+                this.setState({
+                    spinnerStatus: false,
+                })
+            });
         }
-        this.setState({
-            showThreeDaysWeather: !this.state.showThreeDaysWeather,
-            spinnerOnThreeDays: false
-        });
-    }
+    };
 
     render() {
         let weatherData = this.props.weather;
@@ -55,21 +49,21 @@ class ShowCityAndWeather extends React.Component {
         let gismeteoHumidity;
         let weatherComTemp;
         let weatherComHumidity;
-        if (this.props.source.yandexFlag === false || weatherData.yandex === undefined) {
+        if (!this.props.source.yandexFlag || weatherData.yandex === undefined) {
             yandexTemp = DATA_NOT_AVAILABLE_TEXT;
             yandexHumidity = DATA_NOT_AVAILABLE_TEXT;
         } else {
             yandexTemp = weatherData.yandex.temp;
             yandexHumidity = weatherData.yandex.humidity;
         }
-        if (this.props.source.gismeteoFlag === false || weatherData.gismeteo === undefined) {
+        if (!this.props.source.gismeteoFlag || weatherData.gismeteo === undefined) {
             gismeteoTemp = DATA_NOT_AVAILABLE_TEXT;
             gismeteoHumidity = DATA_NOT_AVAILABLE_TEXT;
         } else {
             gismeteoTemp = weatherData.gismeteo.temp;
             gismeteoHumidity = weatherData.gismeteo.humidity;
         }
-        if (this.props.source.weatherFlag === false || weatherData.weatherCom === undefined) {
+        if (!this.props.source.weatherFlag || weatherData.weatherCom === undefined) {
             weatherComTemp = DATA_NOT_AVAILABLE_TEXT;
             weatherComHumidity = DATA_NOT_AVAILABLE_TEXT;
         } else {
@@ -86,7 +80,7 @@ class ShowCityAndWeather extends React.Component {
                 <div className="information_position">
                     <button type="button" onClick={this.deleteCity.bind(this)}>&times;</button>
                     <div className="spinner_position">
-                        {this.state.spinnerOnThreeDays || this.props.spinnerOnThreeDays ? <Spinner/> : null}
+                        {this.state.spinnerStatus ? <Spinner/> : null}
                     </div>
                 </div>
                 <div onClick={this.onClickShowThreeDaysWeather.bind(this)}>

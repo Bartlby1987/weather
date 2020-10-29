@@ -7,7 +7,6 @@ class ShowCitesAndWeather extends React.Component {
     render() {
         let showCityAndWeather = [];
         let deleteCity = this.props.delete;
-        let threeDaysWeather = this.props.threeDaysWeather;
         let onClickShowWeatherOnThreeDays = this.props.onClickShowWeatherOnThreeDays;
         let weatherData = this.props.cities;
         let source = this.props.source;
@@ -17,7 +16,6 @@ class ShowCitesAndWeather extends React.Component {
                     weather={weatherData[i]}
                     spinnerOnThreeDays={this.props.spinnerOnThreeDays}
                     delete={deleteCity} source={source}
-                    threeDaysWeather={threeDaysWeather}
                     onClickShowWeatherOnThreeDays={onClickShowWeatherOnThreeDays}
                 />
             </div>;

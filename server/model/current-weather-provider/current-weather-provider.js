@@ -46,29 +46,31 @@ function deleteRepeatCities(cities) {
     return Array.from(new Set(newCitiesArray));
 }
 
-async function getCurrentWeather(token, city = null) {
-    let cities;
-    let newCitiesData = [];
-    let userIdSql = `SELECT USER_ID FROM USERS_SESSIONS  WHERE ID='${token}'`;
-    let userId = (await commonUtils.execAsync(userIdSql))[0]["USER_ID"];
-    let sourcesSql = `SELECT s.NAME FROM USER_SOURCES us JOIN SOURCES s on us.SOURCE_ID= s.ID WHERE us.USER_ID=${userId}`
-    let sources = (await commonUtils.execAsync(sourcesSql)).map((el) => el["NAME"]);
-    if (city === null) {
-        let citiesSql = `SELECT CITY FROM USERS_CITIES WHERE USER_ID='${userId}'`
-        cities = (await commonUtils.execAsync(citiesSql)).map((el) => el["CITY"]);
-    } else {
-        cities = city;
-    }
-    let citiesArray = deleteRepeatCities(cities);
-    citiesArray = [...new Set(citiesArray)];
-    if (citiesArray.length !== 0) {
-        for (let i = 0; i < citiesArray.length; i++) {
-            let city = citiesArray[i];
-            if (city !== "") {
-                newCitiesData.push(createCityWeatherData(city, sources));
-            }
+async function getCurrentWeather(userId, city = null) {
+    try {
+        let cities;
+        let newCitiesData = [];
+        let sourcesSql = `SELECT s.NAME FROM USER_SOURCES us JOIN SOURCES s on us.SOURCE_ID= s.ID WHERE us.USER_ID=${userId}`
+        let sources = (await commonUtils.execAsync(sourcesSql)).map((el) => el["NAME"]);
+        if (city === null) {
+            let citiesSql = `SELECT CITY FROM USERS_CITIES WHERE USER_ID='${userId}'`
+            cities = (await commonUtils.execAsync(citiesSql)).map((el) => el["CITY"]);
+        } else {
+            cities = city;
         }
-        return newCitiesData
+        let citiesArray = deleteRepeatCities(cities);
+        citiesArray = [...new Set(citiesArray)];
+        if (citiesArray.length !== 0) {
+            for (let i = 0; i < citiesArray.length; i++) {
+                let city = citiesArray[i];
+                if (city !== "") {
+                    newCitiesData.push(createCityWeatherData(city, sources));
+                }
+            }
+            return newCitiesData
+        }
+    } catch (err) {
+        console.log(err);
     }
 }
 

@@ -1,14 +1,13 @@
 const commonUtils = require("../common-utilities");
 
-async function deleteCity(city, token) {
+async function deleteCity(city, userId) {
     return new Promise(async (resolve, reject) => {
-        let userIdSql = `SELECT USER_ID FROM USERS_SESSIONS  WHERE ID='${token}'`;
         try {
-            let userId = (await commonUtils.execAsync(userIdSql))[0]["USER_ID"];
             let deleteCity = `DELETE FROM USERS_CITIES  WHERE USER_ID='${userId}' AND CITY='${city}'`;
             await commonUtils.execAsync(deleteCity);
             resolve(true);
         } catch (error) {
+            console.error(error);
             reject("Technical issue");
         }
     })

@@ -11,6 +11,7 @@ async function createTables() {
 function sqlRequest(sql) {
     db.exec(sql, (err) => {
         if (err) {
+            console.log(err);
             throw err;
         }
     });

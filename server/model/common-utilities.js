@@ -10,6 +10,7 @@ async function execAsync(sql, params) {
     return new Promise((resolve, reject) => {
         db.all(sql, params, (error, result) => {
             if (error) {
+                console.error(error);
                 reject(error)
             } else {
                 resolve(result)
@@ -18,27 +19,31 @@ async function execAsync(sql, params) {
     })
 }
 
-function changeSourceStructure(source) {
-    let sourceObj = {
-        yandexFlag: false,
-        gismeteoFlag: false,
-        weatherFlag: false,
-    };
-    for (let i = 0; i < source.length; i++) {
-        if (source[i] === "yandex") {
-            sourceObj.yandexFlag = true;
-        } else if (source[i] === "gismeteo") {
-            sourceObj.gismeteoFlag = true
-        } else if (source[i] === "weatherCom") {
-            sourceObj.weatherFlag = true;
-        }
+async function getUserId(token) {
+    let userIdSql = `SELECT USER_ID FROM USERS_SESSIONS  WHERE ID='${token}'`;
+    let userId = await execAsync(userIdSql);
+    if (userId || userId.length !== 0) {
+        return userId[0]["USER_ID"];
     }
-    return sourceObj;
+}
+
+function changeSourceStructure(source) {
+    let mySet = new Set(source);
+    let mapping = {
+        yandexFlag: "yandex",
+        gismeteoFlag: "gismeteo",
+        weatherFlag: "weatherCom",
+    };
+    for (let key in mapping) {
+        mapping[key] = mySet.has(mapping[key])
+    }
+    return mapping
 }
 
 module.exports = {
     logDataLoadingError: logDataLoadingError,
     execAsync: execAsync,
-    changeSourceStructure: changeSourceStructure
+    changeSourceStructure: changeSourceStructure,
+    getUserId: getUserId
 };
 
