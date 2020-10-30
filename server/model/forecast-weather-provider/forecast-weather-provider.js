@@ -25,6 +25,19 @@ async function getForecastData(city, userId) {
     }
 }
 
+function modifyDayWeatherInfo(arr) {
+    arr.forEach(element => {
+        element["date"] = element["date"].split(",")[0] + "," + element["date"].split(",")[1];
+        if (Number(element["tempDay"]) > 0) {
+            element["tempDay"] = "+" + element["tempDay"];
+        }
+        if (Number(element["tempNight"]) > 0) {
+            element["tempNight"] = "+" + element["tempNight"];
+        }
+    });
+    return arr
+}
+
 function getForecastWeatherData(cityAndSource) {
     let city = cityAndSource.city;
     let requestedSourcesForecast = [];
@@ -47,7 +60,7 @@ function getForecastWeatherData(cityAndSource) {
     for (let i = 0; i < 3; i++) {
         forecastData.push(forecastWeatherUtils.calculateAverageWeatherData(requestedSourcesForecastForDays[i], date[i]))
     }
-    return forecastData
+    return modifyDayWeatherInfo(forecastData)
 }
 
 module.exports = {
