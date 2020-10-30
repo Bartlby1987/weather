@@ -22,24 +22,15 @@ class ThreeDaysWeather extends React.Component {
                 "Осадки": overcastWeather
             };
 
-            let newArr = this.props.threeDaysWeather;
-
-            newArr.forEach(function (elem) {
-                let dateDay = <th>
+            let forecastData = this.props.threeDaysWeather;
+            forecastData.forEach(function (elem) {
+                date.push(<th>
                     <div>{elem.date}</div>
-                </th>;
-                date.push(dateDay);
+                </th>);
+                tempDay.push(<td>{weatherData[elem["humidityDay"]]} {elem["tempDay"]}</td>);
+                tempNight.push(<td>{weatherData[elem["humidityNight"]]} {elem["tempNight"]}</td>);
             });
 
-            newArr.forEach(function (elem) {
-                let temp = <td>{weatherData[elem["humidityDay"]]} {elem["tempDay"]}</td>
-                tempDay.push(temp);
-            });
-
-            newArr.forEach(function (elem) {
-                let temp = <td>{weatherData[elem["humidityNight"]]} {elem["tempNight"]}</td>
-                tempNight.push(temp);
-            });
         } catch (e) {
             date.push(<th>
                 <div></div>
